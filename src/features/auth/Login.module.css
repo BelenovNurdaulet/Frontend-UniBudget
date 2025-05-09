@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.card {
+  max-width: 40rem;
+}
+
+.Typography {
+  font-weight: bold;
+  text-align: center;
+}
