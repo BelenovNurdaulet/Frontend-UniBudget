@@ -35,8 +35,13 @@ export const HEADER_LINKS = [
     roles: [ROLES.Administration],
   },
   {
-    text: 'Загруженность сотрудников',
-    href: '/users/workload',
+    text: 'Создать период',
+    href: '/create-period',
+    roles: [ROLES.Administration],
+  },
+  {
+    text: 'Периоды',
+    href: '/periods',
     roles: [ROLES.Administration],
   },
   {

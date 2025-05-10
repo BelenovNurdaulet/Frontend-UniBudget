@@ -4,7 +4,7 @@ import { apiSlice } from '../../app/api/apiSlice'
 export const referenceApi = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         getReference: builder.query({
-            query: () => '/api/reference',
+            query: () => '/api/references',
         }),
     }),
     overrideExisting: false,

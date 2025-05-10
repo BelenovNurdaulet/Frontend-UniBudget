@@ -10,7 +10,10 @@ function RouteRedirect() {
         return <Navigate to="/login" replace />
     }
 
-    const userRole = user?.userRole
+    const roleClaim  = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
+    const roleName   = user?.[roleClaim]      // "Administration"
+    const userRole   = ROLES[roleName]
+
     if (userRole === ROLES.Administration) {
         return <Navigate to="/issuances" replace />
     }

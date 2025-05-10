@@ -13,6 +13,7 @@
     "@ozen-ui/icons": "^0.71.0",
     "@ozen-ui/kit": "^0.71.0",
     "@reduxjs/toolkit": "^2.7.0",
+    "dayjs": "^1.11.13",
     "jwt-decode": "^4.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

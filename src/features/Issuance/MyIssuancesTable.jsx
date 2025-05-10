@@ -1,3 +1,7 @@
-export default class MyIssuancesTable {
-
+const MyIssuancesTable = () => {
+return(
+    <div>Мои заявки</div>
+)
 }
+
+export default MyIssuancesTable

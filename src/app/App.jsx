@@ -21,6 +21,10 @@ import {ErrorBoundary} from 'react-error-boundary'
 import {ErrorFallback} from '../components/ErrorFallback/ErrorFallback'
 import {lazy} from 'react'
 import PublicRoute from "../components/PublicRoute.jsx";
+import Periods from "../features/period/Periods.jsx";
+import PeriodInfo from "../features/period/periodInfo/PeriodInfo.jsx";
+import CreatePeriod from "../features/period/CreatePeriod.jsx";
+import EditPeriod from "../features/period/EditPeriod.jsx";
 
 
 const UserProfile = lazy(() => import('../features/UserProfle/UserProfile'))
@@ -61,7 +65,11 @@ function App() {
 
                                     {/* Admin-only */}
                                     <Route element={<ProtectedRoute allowedRoles={[ROLES.Administration]}/>}>
+                                        <Route path="/periods" element={<Periods/>}/>
                                         <Route path="/users" element={<UserList/>}/>
+                                        <Route path="/period/:id" element={<PeriodInfo />} />
+                                        <Route path="/period/:id/edit" element={<EditPeriod />} />
+<Route path="/create-period" element={<CreatePeriod />}/>
                                         <Route path="/issuances" element={<AllIssuancesTable/>}/>
                                         <Route path="/issuances/completed" element={<AllIssuancesTable/>}/>
 
