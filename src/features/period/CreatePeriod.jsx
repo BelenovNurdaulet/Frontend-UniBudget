@@ -13,6 +13,7 @@ import styles from './CreatePeriod.module.css'
 const CreatePeriod = () => {
     const { control, handleSubmit, reset } = useForm({
         defaultValues: {
+            name: '',
             submissionDate: '',
             submissionTime: '00:00',
             submissionEndDate: '',
@@ -37,6 +38,7 @@ const CreatePeriod = () => {
                 new Date(`${new Date(date).toISOString().split('T')[0]}T${time}:00`).toISOString()
 
             const payload = {
+                name: values.name,
                 submissionStartDate: composeDateTime(values.submissionDate, values.submissionTime),
                 submissionEndDate: composeDateTime(values.submissionEndDate, values.submissionEndTime),
                 approvalStartDate: composeDateTime(values.approvalDate, values.approvalTime),
@@ -67,6 +69,15 @@ const CreatePeriod = () => {
             <Typography variant="heading-xl">Создать период</Typography>
             <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
                 <Stack direction="column" gap="m">
+                    <Controller
+                        name="name"
+                        control={control}
+                        rules={{ required: 'Укажите название периода' }}
+                        render={({ field }) => (
+                            <Input label="Название периода" {...field} fullWidth required />
+                        )}
+                    />
+
                     {/* Submission Start */}
                     <Grid cols={2} gap="m">
                         <GridItem>

@@ -4,19 +4,17 @@ export const HEADER_LINKS = [
   {
     text: 'Все заявки',
     href: '/issuances',
-    roles: [ROLES.Administration],
+    roles: [ROLES.Administration,
+    ROLES.Executor,
+    ROLES.Finance],
   },
-  {
-    text: 'Завершенные заявки',
-    href: '/issuances/completed',
-    roles: [ROLES.Administration],
-  },
+
   { text: 'Мои заявки', href: '/my-issuances', roles: ALL_ROLES },
   { text: 'Завершенные заявки', href: '/my-issuances/completed',
     roles:
         [
           ROLES.RequestCreator,
-          ROLES.Executor,
+
         ]
   },
   {
@@ -25,8 +23,7 @@ export const HEADER_LINKS = [
     roles: [
       ROLES.Administration,
       ROLES.RequestCreator,
-      ROLES.Finance,
-      ROLES.Executor,
+
     ],
   },
   {

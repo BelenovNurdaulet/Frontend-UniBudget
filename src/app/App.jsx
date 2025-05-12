@@ -25,6 +25,10 @@ import Periods from "../features/period/Periods.jsx";
 import PeriodInfo from "../features/period/periodInfo/PeriodInfo.jsx";
 import CreatePeriod from "../features/period/CreatePeriod.jsx";
 import EditPeriod from "../features/period/EditPeriod.jsx";
+import AllRequestsTable from "../features/request/AllRequestsTable.jsx";
+import UsersList from "../features/Users/UsersList.jsx";
+import RequestInfo from "../features/request/RequestInfo/RequestInfo.jsx";
+import CreateRequest from "../features/request/CreateRequest.jsx";
 
 
 const UserProfile = lazy(() => import('../features/UserProfle/UserProfile'))
@@ -62,6 +66,7 @@ function App() {
                                     <Route path="/" element={<RouteRedirect/>}/>
                                     <Route path="/signup" element={<Register/>}/>
                                     <Route path="/unauthorized" element={<Unauthorized/>}/>
+                                    <Route path="/request/:id" element={<RequestInfo />}/>
 
                                     {/* Admin-only */}
                                     <Route element={<ProtectedRoute allowedRoles={[ROLES.Administration]}/>}>
@@ -70,7 +75,7 @@ function App() {
                                         <Route path="/period/:id" element={<PeriodInfo />} />
                                         <Route path="/period/:id/edit" element={<EditPeriod />} />
 <Route path="/create-period" element={<CreatePeriod />}/>
-                                        <Route path="/issuances" element={<AllIssuancesTable/>}/>
+                                        <Route path="/issuances" element={<AllRequestsTable/>}/>
                                         <Route path="/issuances/completed" element={<AllIssuancesTable/>}/>
 
                                     </Route>
@@ -87,7 +92,7 @@ function App() {
                                             />
                                         }
                                     >
-                                        <Route path="/create" element={<CreateIssuance/>}/>
+                                        <Route path="/create" element={<CreateRequest/>}/>
                                     </Route>
                                 </Routes>
                             </Suspense>
