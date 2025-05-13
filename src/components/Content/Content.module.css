@@ -1,0 +1,24 @@
+@import url('../../vars.modules.css');
+
+.content {
+  flex-grow: 1;
+  display: flex;
+  overflow-y: hidden;
+  box-sizing: border-box;
+  flex-direction: column;
+  background-color: var(--color-background-primary);
+
+  &::after {
+    content: "";
+    inset: 0;
+    position: absolute;
+    z-index: -1;
+    background-color: var(--color-accent-main);
+  }
+}
+
+@media (--breakpoint-m) {
+  .content {
+    border-radius: var(--paper-border-radius) 0 0 var(--paper-border-radius);
+  }
+}

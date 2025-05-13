@@ -1,0 +1,37 @@
+:global(.AppBar) {
+  --appbar-width: 64px;
+  --appbar-fullwidth: 256px;
+  position: relative;
+  display: inline-flex;
+  background-color: var(--color-accent-main);
+
+  :global(.Divider) {
+    border-color: var(--color-accent-primary);
+  }
+}
+
+:global(.AppBarMobile) {
+  block-size: 100%;
+
+  :global(.Divider) {
+    border-color: var(--color-accent-primary);
+  }
+}
+
+:global(.Toolbar) {
+  flex: 0 0 auto;
+  overflow: hidden;
+  block-size: 100%;
+  box-sizing: border-box;
+  transition: inline-size 195ms cubic-bezier(0.4, 0, 0.6, 1) 0ms;
+  color: var(--color-accent-main-inverse);
+  inline-size: var(--appbar-width);
+
+  &[data-expand='true'] {
+    inline-size: var(--appbar-fullwidth);
+  }
+}
+
+.window {
+  --drawer-width: 256px;
+}

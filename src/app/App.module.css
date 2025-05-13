@@ -1,12 +1,4 @@
-.appContainer {
+.app {
   display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  margin: 0 2rem;
-}
-
-.mainContent {
-  flex: 1;
-  margin: 0 auto;
-  width: 100%;
+  block-size: calc(var(--vh, 1vh) * 100);
 }

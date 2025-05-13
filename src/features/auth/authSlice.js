@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { authApi } from './authApi'
+
 import { jwtDecode } from 'jwt-decode'
 
 const token = localStorage.getItem('access_token')
@@ -31,29 +31,7 @@ const authSlice = createSlice({
             localStorage.removeItem('access_token')
         },
     },
-    extraReducers: (builder) => {
-        builder
-            .addMatcher(
-                authApi.endpoints.login.matchFulfilled,
-                (state, { payload }) => {
-                    const { token } = payload
-                    state.token = token
-                    state.user = jwtDecode(token)
-                    state.isAuthenticated = true
-                    localStorage.setItem('access_token', token)
-                }
-            )
-            .addMatcher(
-                authApi.endpoints.login.matchRejected,
-                (state) => {
-                    state.token = null
-                    state.user = null
-                    state.isAuthenticated = false
-                    localStorage.removeItem('access_token')
-                }
-            )
 
-    },
 })
 
 export const { logout, setCredentials } = authSlice.actions

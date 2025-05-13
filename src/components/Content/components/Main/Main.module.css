@@ -1,0 +1,8 @@
+.main {
+  flex-grow: 1;
+  display: flex;
+  overflow-y: auto;
+  position: relative;
+  flex-direction: column;
+  scroll-behavior: smooth;
+}
