@@ -1,80 +1,43 @@
-.container {
-    width: 100%;
+.pageWrapper {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    padding: 2rem;
-    margin: 0 auto;
+    gap: 24px;
 }
 
-.cardWrapper {
-    padding: 0.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.clickableHeader {
-    cursor: pointer;
-    user-select: none;
+.title {
     font-weight: 600;
-    transition: color 0.2s;
+    margin-bottom: 24px;
 }
 
-.clickableHeader:hover {
-    color: #007aff;
+.tableWrapper {
+    overflow: auto;
+    min-height: 500px;
 }
 
-.loaderWrapper,
-.errorWrapper {
+.loaderWrapper {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 50vh;
+    min-height: 500px;
 }
 
-.tableCell {
-    font-size: 14px;
+.footer {
+    margin-top: 24px;
+    display: flex;
+    justify-content: flex-end;
 }
 
-.clickableCell {
-    font-size: 14px;
+.sortable {
     cursor: pointer;
-    transition: background-color 0.2s ease-in-out;
-    padding: 0.5rem;
 }
 
-.blockedRow {
-    background-color: #ffe5e5 !important;
+.sortLabel {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
 }
 
-.clickableCell:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-}
-
-.detailsLink {
-    font-size: 14px;
+.link {
+    color: var(--color-action);
     text-decoration: none;
-    transition: text-decoration 0.2s ease-in-out;
-    color: #00BB00;
 }
-
-.detailsLink:hover {
-    text-decoration: underline;
-    color: #039904;
-}
-
-.dialog-body-unclipped {
-    overflow: visible !important;
-}
-
-.ozen-dialog__body {
-    overflow: visible !important;
-    position: relative;
-    z-index: 1;
-}
-
-.ozen-datepicker__portal {
-    z-index: 2000 !important; /* выше диалога */
-}
-

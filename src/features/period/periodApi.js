@@ -47,6 +47,15 @@ export const periodApi = apiSlice.injectEndpoints({
             refetchOnMountOrArgChange: true,
             keepUnusedDataFor: 0,
         }),
+        getPeriodExcel: builder.query({
+            query: (periodId) => ({
+                url: `/api/period/excel?periodId=${periodId}`,
+                method: 'GET',
+                responseHandler: (response) => response.blob(),
+            }),
+            keepUnusedDataFor: 0,
+        }),
+
 
     }),
 })
@@ -56,5 +65,6 @@ export const {
     useCreatePeriodMutation,
     useUpdatePeriodMutation,
     useGetPeriodByIdQuery,
+    useLazyGetPeriodExcelQuery,
 
 } = periodApi

@@ -1,21 +1,25 @@
+/* Login.module.css */
 .container {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 100vh;
+  background-color: var(--color-background-secondary);
+}
+
+.card {
+  padding: var(--spacing-3xl);
+  border-radius: var(--border-radius-l);
   width: 100%;
+  max-width: 400px;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-}
-
-.card {
-  max-width: 40rem;
+  gap: var(--spacing-m);
 }
 
 .Typography {
-  font-weight: bold;
   text-align: center;
 }

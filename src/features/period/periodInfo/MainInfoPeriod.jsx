@@ -6,6 +6,7 @@ import getFormattedDate from "../../../utils/getFormattedDate.js";
 
 const MainInfoPeriod = ({ period }) => {
     const {
+        name,
         periodType,
         submissionStartDate,
         submissionEndDate,
@@ -33,9 +34,10 @@ const MainInfoPeriod = ({ period }) => {
                     <Table size="s" striped divider="row" fullWidth>
                         <TableBody>
                             <TableRow>
-                                <TableCell align="left" width="50%">Тип:</TableCell>
-                                <TableCell align="right">{periodType}</TableCell>
+                                <TableCell align="left" width="50%">Название:</TableCell>
+                                <TableCell align="right">{name}</TableCell>
                             </TableRow>
+
                             <TableRow>
                                 <TableCell align="left">Срок подачи:</TableCell>
                                 <TableCell align="right">{getFormattedDate(submissionStartDate)} — {getFormattedDate(submissionEndDate)}</TableCell>

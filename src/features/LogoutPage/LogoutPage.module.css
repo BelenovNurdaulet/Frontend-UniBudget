@@ -1,0 +1,23 @@
+@import url('../../vars.modules.css');
+
+.logout {
+  overflow: auto;
+  display: flex;
+  inline-size: 100%;
+  background-color: var(--color-background-main-hover);
+}
+
+.container {
+  margin: 0 auto auto;
+}
+
+.form {
+  max-inline-size: 420px;
+  margin: var(--spacing-s);
+}
+
+@media (--breakpoint-s) {
+  .form {
+    margin: var(--spacing-l) auto;
+  }
+}

@@ -31,37 +31,24 @@ const PeriodInfo = () => {
         )
     }
 
-    const { id: periodId, isActive, periodHistories } = data
+    const { id: periodId, name , periodHistories } = data
 
     return (
         <div
-            style={{
-                maxWidth: '900px',
-                margin: '0 auto',
-                padding: '2rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1rem',
-            }}
+
         >
             <Grid cols={2} align="start">
                 <Grid cols={1}>
                     <GridItem>
                         <Typography variant="heading-xl" className={spacing({ mb: 'm' })}>
-                            Период №{periodId}
+                            Бюджетный период "{name}"
                         </Typography>
-                        <PeriodActions period={data} />
+
                     </GridItem>
                 </Grid>
                 <Grid cols={1} justify="end">
                     <GridItem row={1}>
-                        <Tag
-                            as="div"
-                            size="m"
-                            variant="secondary"
-                            label={isActive ? 'Активен' : 'Неактивен'}
-                            style={{ width: 'fit-content' }}
-                        />
+                        <PeriodActions period={data} />
                     </GridItem>
                 </Grid>
             </Grid>

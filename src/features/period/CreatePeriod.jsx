@@ -8,10 +8,11 @@ import { useSnackbar } from '@ozen-ui/kit/Snackbar'
 import { Card } from '@ozen-ui/kit/Card'
 import { Stack } from '@ozen-ui/kit/Stack'
 import { Grid, GridItem } from '@ozen-ui/kit/Grid'
-import styles from './CreatePeriod.module.css'
+import { spacing } from '@ozen-ui/kit/MixSpacing'
+import { useNavigate } from 'react-router-dom'
 
 const CreatePeriod = () => {
-    const { control, handleSubmit, reset } = useForm({
+    const { control, handleSubmit } = useForm({
         defaultValues: {
             name: '',
             submissionDate: '',
@@ -31,12 +32,13 @@ const CreatePeriod = () => {
 
     const { pushMessage } = useSnackbar()
     const [createPeriod, { isLoading }] = useCreatePeriodMutation()
+    const navigate = useNavigate()
 
     const onSubmit = async (values) => {
-        try {
-            const composeDateTime = (date, time) =>
-                new Date(`${new Date(date).toISOString().split('T')[0]}T${time}:00`).toISOString()
+        const composeDateTime = (date, time) =>
+            new Date(`${new Date(date).toISOString().split('T')[0]}T${time}:00`).toISOString()
 
+        try {
             const payload = {
                 name: values.name,
                 submissionStartDate: composeDateTime(values.submissionDate, values.submissionTime),
@@ -48,14 +50,9 @@ const CreatePeriod = () => {
             }
 
             await createPeriod(payload).unwrap()
-            pushMessage({
-                title: 'Успех',
-                description: 'Период успешно создан',
-                status: 'success',
-            })
-            reset()
+            pushMessage({ title: 'Успех', description: 'Период успешно создан', status: 'success' })
+            navigate('/periods')
         } catch (err) {
-            console.error('Ошибка при создании периода:', err)
             pushMessage({
                 title: 'Ошибка',
                 description: err?.data?.error || 'Не удалось создать период',
@@ -64,164 +61,77 @@ const CreatePeriod = () => {
         }
     }
 
+    const renderDateTimeGroup = (label, dateName, timeName) => (
+        <Grid cols={{ xs: 1, m: 12 }} gap="s" align="center">
+            <GridItem col={{ xs: 1, m: 3 }}>
+                <Typography variant="text-m">{label}</Typography>
+            </GridItem>
+            <GridItem col={{ xs: 1, m: 4 }}>
+                <Controller
+
+                    name={dateName}
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field }) => <DatePicker size="s" fullWidth required {...field} />}
+                />
+            </GridItem>
+            <GridItem col={{ xs: 1, m: 5 }}>
+                <Controller
+                    name={timeName}
+                    control={control}
+                    render={({ field }) => (
+                        <Input type="time" fullWidth required {...field} size="s" />
+                    )}
+                />
+            </GridItem>
+        </Grid>
+    )
+
     return (
-        <Card className={styles.container} size="m" shadow="m">
-            <Typography variant="heading-xl">Создать период</Typography>
-            <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-                <Stack direction="column" gap="m">
-                    <Controller
-                        name="name"
-                        control={control}
-                        rules={{ required: 'Укажите название периода' }}
-                        render={({ field }) => (
-                            <Input label="Название периода" {...field} fullWidth required />
-                        )}
-                    />
+        <div>
+            <Typography variant="heading-xl" className={spacing({ mb: 'm' })}>
+                Cоздать бюджетный период
+            </Typography>
 
-                    {/* Submission Start */}
-                    <Grid cols={2} gap="m">
-                        <GridItem>
-                            <Controller
-                                name="submissionDate"
-                                control={control}
-                                rules={{ required: 'Укажите дату начала подачи' }}
-                                render={({ field }) => (
-                                    <DatePicker label="Дата начала подачи" {...field} fullWidth required />
-                                )}
-                            />
-                        </GridItem>
-                        <GridItem>
-                            <Controller
-                                name="submissionTime"
-                                control={control}
-                                render={({ field }) => (
-                                    <Input label="Время начала подачи" type="time" {...field} fullWidth />
-                                )}
-                            />
-                        </GridItem>
-                    </Grid>
+        <Grid cols={{ xs: 1, m: 12 }} gap="xl">
+            <GridItem col={{ xs: 1, m: 12 }}>
 
-                    {/* Submission End */}
-                    <Grid cols={2} gap="m">
-                        <GridItem>
-                            <Controller
-                                name="submissionEndDate"
-                                control={control}
-                                rules={{ required: 'Укажите дату окончания подачи' }}
-                                render={({ field }) => (
-                                    <DatePicker label="Дата окончания подачи" {...field} fullWidth required />
-                                )}
-                            />
-                        </GridItem>
-                        <GridItem>
-                            <Controller
-                                name="submissionEndTime"
-                                control={control}
-                                render={({ field }) => (
-                                    <Input label="Время окончания подачи" type="time" {...field} fullWidth />
-                                )}
-                            />
-                        </GridItem>
-                    </Grid>
+                <Card size="m" shadow="m">
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                        <Stack direction="column" gap="xl" fullWidth>
 
-                    {/* Approval Start */}
-                    <Grid cols={2} gap="m">
-                        <GridItem>
-                            <Controller
-                                name="approvalDate"
-                                control={control}
-                                rules={{ required: 'Укажите дату начала согласования' }}
-                                render={({ field }) => (
-                                    <DatePicker label="Дата начала согласования" {...field} fullWidth required />
-                                )}
-                            />
-                        </GridItem>
-                        <GridItem>
-                            <Controller
-                                name="approvalTime"
-                                control={control}
-                                render={({ field }) => (
-                                    <Input label="Время начала согласования" type="time" {...field} fullWidth />
-                                )}
-                            />
-                        </GridItem>
-                    </Grid>
 
-                    {/* Approval End */}
-                    <Grid cols={2} gap="m">
-                        <GridItem>
                             <Controller
-                                name="approvalEndDate"
+                                name="name"
                                 control={control}
-                                rules={{ required: 'Укажите дату окончания согласования' }}
+                                rules={{ required: true }}
                                 render={({ field }) => (
-                                    <DatePicker label="Дата окончания согласования" {...field} fullWidth required />
+                                    <Input size="s" label="Название периода" fullWidth required {...field} />
                                 )}
                             />
-                        </GridItem>
-                        <GridItem>
-                            <Controller
-                                name="approvalEndTime"
-                                control={control}
-                                render={({ field }) => (
-                                    <Input label="Время окончания согласования" type="time" {...field} fullWidth />
-                                )}
-                            />
-                        </GridItem>
-                    </Grid>
 
-                    {/* Execution Start */}
-                    <Grid cols={2} gap="m">
-                        <GridItem>
-                            <Controller
-                                name="executionDate"
-                                control={control}
-                                rules={{ required: 'Укажите дату начала исполнения' }}
-                                render={({ field }) => (
-                                    <DatePicker label="Дата начала исполнения" {...field} fullWidth required />
-                                )}
-                            />
-                        </GridItem>
-                        <GridItem>
-                            <Controller
-                                name="executionTime"
-                                control={control}
-                                render={({ field }) => (
-                                    <Input label="Время начала исполнения" type="time" {...field} fullWidth />
-                                )}
-                            />
-                        </GridItem>
-                    </Grid>
+                            {renderDateTimeGroup('Начало подачи', 'submissionDate', 'submissionTime')}
+                            {renderDateTimeGroup('Окончание подачи', 'submissionEndDate', 'submissionEndTime')}
+                            {renderDateTimeGroup('Начало согласования', 'approvalDate', 'approvalTime')}
+                            {renderDateTimeGroup('Окончание согласования', 'approvalEndDate', 'approvalEndTime')}
+                            {renderDateTimeGroup('Начало исполнения', 'executionDate', 'executionTime')}
+                            {renderDateTimeGroup('Окончание исполнения', 'executionEndDate', 'executionEndTime')}
 
-                    {/* Execution End */}
-                    <Grid cols={2} gap="m">
-                        <GridItem>
-                            <Controller
-                                name="executionEndDate"
-                                control={control}
-                                rules={{ required: 'Укажите дату окончания исполнения' }}
-                                render={({ field }) => (
-                                    <DatePicker label="Дата окончания исполнения" {...field} fullWidth required />
-                                )}
-                            />
-                        </GridItem>
-                        <GridItem>
-                            <Controller
-                                name="executionEndTime"
-                                control={control}
-                                render={({ field }) => (
-                                    <Input label="Время окончания исполнения" type="time" {...field} fullWidth />
-                                )}
-                            />
-                        </GridItem>
-                    </Grid>
+                            <Stack justify="end" gap="m" fullWidth>
+                                <Button variant="function" onClick={() => navigate('/periods')}>
+                                    Отмена
+                                </Button>
+                                <Button type="submit" variant="contained" loading={isLoading}>
+                                    Создать период
+                                </Button>
+                            </Stack>
+                        </Stack>
+                    </form>
+                </Card>
+            </GridItem>
+        </Grid>
+        </div>
 
-                    <Button type="submit" variant="contained" color="primary" loading={isLoading}>
-                        Создать период
-                    </Button>
-                </Stack>
-            </form>
-        </Card>
     )
 }
 

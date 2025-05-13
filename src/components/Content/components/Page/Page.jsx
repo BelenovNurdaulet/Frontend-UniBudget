@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { BreadcrumbItem, Breadcrumbs } from '@ozen-ui/kit/Breadcrumbs';
 import { Container } from '@ozen-ui/kit/Container';
 import { spacing } from '@ozen-ui/kit/MixSpacing';
-import { Typography } from '@ozen-ui/kit/Typography';
+
 import { useBreakpoints } from '@ozen-ui/kit/useBreakpoints';
 import clsx from 'clsx';
 import { parse } from 'regexparam';
@@ -40,8 +40,8 @@ export const Page = ({ component: Component, containerProps }) => {
     }, [locations]);
 
     const root = breadcrumbs[0];
-    const showBreadcrumbs = !root?.disableBreadcrumbs && !isMobile && breadcrumbs.length > 1;
-    const showHeader = !root?.disableHeader && root?.title;
+
+    const showBreadcrumbs = !root?.disableBreadcrumbs && !isMobile;
 
     if (!Component) return null;
 
@@ -67,11 +67,7 @@ export const Page = ({ component: Component, containerProps }) => {
                     ))}
                 </Breadcrumbs>
             )}
-            {showHeader && (
-                <Typography variant={isMobile ? 'heading-l' : 'heading-xl'} as="h1">
-                    {root.title}
-                </Typography>
-            )}
+
             <Component {...params} />
         </Container>
     );

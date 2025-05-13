@@ -7,6 +7,7 @@ import {AppBarFooter} from "../components/AppBar/components/AppBarFooter/AppBarF
 import {AppProvider} from "./AppContext.jsx";
 import {Content} from "../components/Content/Content.jsx";
 import {AppBarProvider} from "../components/AppBar/AppBarContext.jsx";
+import {Profile} from "../components/Profile/Profile.jsx";
 
 
 function App() {
@@ -21,14 +22,12 @@ function App() {
                     </AppBarBody>
                     <Divider />
                     <AppBarFooter>
+                       < Profile/>
                     </AppBarFooter>
 
                 </AppBar>
                 <Content/>
             </AppBarProvider >
-
-
-
         </AppProvider>
     )
 }

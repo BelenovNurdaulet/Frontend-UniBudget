@@ -1,0 +1,20 @@
+@import url('../../vars.modules.css');
+
+.login {
+  display: flex;
+  overflow: auto;
+  inline-size: 100%;
+  background: var(--color-background-main);
+}
+
+.container {
+  margin: auto;
+}
+
+.form {
+  margin: var(--spacing-m) 0;
+}
+.login {
+  background: var(--color-background-primary);
+}
+

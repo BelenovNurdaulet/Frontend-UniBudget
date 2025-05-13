@@ -11,6 +11,10 @@ import s from './App.module.css'
 
 
 import Login from "../features/auth/Login.jsx";
+import Register from "../features/registration/Register.jsx";
+import {LoginPage} from "../features/LoginPage/LoginPage.jsx";
+import {RegistrationPage} from "../features/RegistrationPage/RegistrationPage.jsx";
+import {LogoutPage} from "../features/LogoutPage/LogoutPage.jsx";
 
 export const AppContext = createContext({})
 
@@ -26,12 +30,22 @@ export const AppProvider = ({ children }) => {
     scrollContainerEl?.scrollTo({ top: 0, behavior: 'instant' })
   }, [location.pathname, scrollContainerEl])
 
-  const renderContent = () => {
-    if (!isAuthenticated) return <Login/>
-    if (location.pathname === '/logout') return <LogoutPage />
-    return children
-  }
+    const renderContent = () => {
+        // сначала обрабатываем публичные маршруты
+        if (location.pathname === '/signup') {
+            return <RegistrationPage />;
+        }
 
+
+        if (!isAuthenticated) {
+            return <LoginPage />;
+        }
+        if (location.pathname === '/logout') {
+            return <LogoutPage />;
+        }
+
+        return children;
+    };
   return (
       <ThemeProvider theme={themeOzenDefault} className={s.app}>
         <SnackbarProvider

@@ -5,7 +5,7 @@ export const HEADER_LINKS = [
     text: 'Все заявки',
     href: '/issuances',
     roles: [ROLES.Administration,
-    ROLES.Executor,
+    ROLES.HeadOfDepartment,
     ROLES.Finance],
   },
 

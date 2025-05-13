@@ -2,19 +2,17 @@
 import { ROLES } from '../roles'
 
 export const REQUEST_STATUSES_CONFIG = {
-  0: {
-    name: 'Черновик',
-    responsibleRole: null,
+  Created: {
+    name: 'Заявка создана',
+    responsibleRole: ROLES.RequestCreator,
     actions: [
-   //   { actionName: 'submit', label: 'Отправить на согласование', requireComment: false },
-     // { actionName: 'cancel', label: 'Отменить', requireComment: true },
 
     ],
 
 
   },
-  1: {
-    name: 'Возвращена автору',
+  ReturnToCreator: {
+    name: 'Возвращена на доработку',
     responsibleRole: null,
     actions: [
      // { actionName: 'submit', label: 'Отправить на согласование', requireComment: false },
@@ -22,39 +20,39 @@ export const REQUEST_STATUSES_CONFIG = {
 
     ],
   },
-  2: {
-    name: 'На проверке руководителем',
-    responsibleRole: ROLES.Executor,
+  InReview: {
+    name: 'На соглосовании руководителем',
+    responsibleRole: ROLES.HeadOfDepartment,
     actions: [
-      { actionName: 'accept', label: 'Принять в работу',    requireComment: false },
+      { actionName: 'approve', label: 'Принять в работу',    requireComment: false },
       { actionName: 'return', label: 'Вернуть на доработку', requireComment: true  },
       { actionName: 'cancel', label: 'Отменить',             requireComment: true  },
     ],
   },
-  3: {
-    name: 'Одобрена руководителем',
+  Approved: {
+    name: 'На соглосовании финансовым отделом',
     responsibleRole: ROLES.Finance,
     actions: [
-      { actionName: 'accept', label: 'Согласовать',          requireComment: false },
+      { actionName: 'approve', label: 'Согласовать',          requireComment: false },
       { actionName: 'return', label: 'Вернуть на доработку', requireComment: true  },
       { actionName: 'cancel', label: 'Отменить',             requireComment: true  },
     ],
   },
-  4: {
-    name: 'Возвращена руководителю',
-    responsibleRole: ROLES.Executor,
+  ReturnToReviewer: {
+    name: 'Возвращена на доработку руководителю',
+    responsibleRole: ROLES.HeadOfDepartment,
     actions: [
-      { actionName: 'accept', label: 'Принять в работу',    requireComment: false },
+      { actionName: 'approve', label: 'Принять в работу',    requireComment: false },
       { actionName: 'return', label: 'Вернуть автору',       requireComment: true  },
       { actionName: 'cancel', label: 'Отменить',             requireComment: true  },
     ],
   },
-  5: {
-    name: 'Согласована финансистом',
+  Submitted: {
+    name: 'Соглосована',
     responsibleRole: null,    // финализированная — дальше ничего нельзя
     actions: [],
   },
-  6: {
+  Cancelled: {
     name: 'Отменена',
     responsibleRole: null,    // отмена — концевой статус
     actions: [],

@@ -9,7 +9,7 @@ import { DatePicker } from '@ozen-ui/kit/DatePicker'
 import { Card } from '@ozen-ui/kit/Card'
 import { Stack } from '@ozen-ui/kit/Stack'
 import { Grid, GridItem } from '@ozen-ui/kit/Grid'
-import styles from './CreatePeriod.module.css'
+import { spacing } from '@ozen-ui/kit/MixSpacing'
 import { useGetPeriodByIdQuery, useUpdatePeriodMutation } from './periodApi'
 
 const EditPeriod = () => {
@@ -17,44 +17,36 @@ const EditPeriod = () => {
     const navigate = useNavigate()
     const { pushMessage } = useSnackbar()
     const { data: periodData } = useGetPeriodByIdQuery(id)
-    const [updatePeriod, { isLoading: isUpdating }] = useUpdatePeriodMutation()
+    const [updatePeriod, { isLoading }] = useUpdatePeriodMutation()
 
     const { control, handleSubmit, reset } = useForm({
         defaultValues: {
-            submissionDate: null,
+            name: '',
+            submissionDate: '',
             submissionTime: '00:00',
-            submissionEndDate: null,
+            submissionEndDate: '',
             submissionEndTime: '00:00',
-            approvalDate: null,
+            approvalDate: '',
             approvalTime: '00:00',
-            approvalEndDate: null,
+            approvalEndDate: '',
             approvalEndTime: '00:00',
-            executionDate: null,
+            executionDate: '',
             executionTime: '00:00',
-            executionEndDate: null,
+            executionEndDate: '',
             executionEndTime: '00:00',
         },
     })
 
     useEffect(() => {
         if (periodData) {
-            const toDate = (dt) => {
-                try {
-                    return new Date(dt)
-                } catch {
-                    return null
-                }
-            }
+            const toDate = (dt) => dt ? new Date(dt) : ''
             const toTime = (dt) => {
-                try {
-                    const d = new Date(dt)
-                    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
-                } catch {
-                    return '00:00'
-                }
+                const d = new Date(dt)
+                return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
             }
 
             reset({
+                name: periodData.name || '',
                 submissionDate: toDate(periodData.submissionStartDate),
                 submissionTime: toTime(periodData.submissionStartDate),
                 submissionEndDate: toDate(periodData.submissionEndDate),
@@ -71,31 +63,25 @@ const EditPeriod = () => {
         }
     }, [periodData, reset])
 
-    const combineDateAndTime = (date, time) => {
-        if (!date || !time) throw new Error('Неверные дата или время')
-        const [hours, minutes] = time.split(':').map(Number)
-        const year = date.getFullYear()
-        const month = date.getMonth()
-        const day = date.getDate()
-        return new Date(Date.UTC(year, month, day, hours, minutes, 0)).toISOString()
-    }
-
+    const composeDateTime = (date, time) =>
+        new Date(`${new Date(date).toISOString().split('T')[0]}T${time}:00`).toISOString()
 
     const onSubmit = async (values) => {
         try {
             const payload = {
                 periodId: Number(id),
-                submissionStartDate: combineDateAndTime(values.submissionDate, values.submissionTime),
-                submissionEndDate: combineDateAndTime(values.submissionEndDate, values.submissionEndTime),
-                approvalStartDate: combineDateAndTime(values.approvalDate, values.approvalTime),
-                approvalEndDate: combineDateAndTime(values.approvalEndDate, values.approvalEndTime),
-                executionStartDate: combineDateAndTime(values.executionDate, values.executionTime),
-                executionEndDate: combineDateAndTime(values.executionEndDate, values.executionEndTime),
+                name: values.name,
+                submissionStartDate: composeDateTime(values.submissionDate, values.submissionTime),
+                submissionEndDate: composeDateTime(values.submissionEndDate, values.submissionEndTime),
+                approvalStartDate: composeDateTime(values.approvalDate, values.approvalTime),
+                approvalEndDate: composeDateTime(values.approvalEndDate, values.approvalEndTime),
+                executionStartDate: composeDateTime(values.executionDate, values.executionTime),
+                executionEndDate: composeDateTime(values.executionEndDate, values.executionEndTime),
             }
 
             await updatePeriod(payload).unwrap()
             pushMessage({ title: 'Успех', description: 'Период обновлен', status: 'success' })
-            navigate(`/period/${id}`)
+            navigate(`/periods/${id}`)
         } catch (err) {
             pushMessage({
                 title: 'Ошибка',
@@ -105,48 +91,73 @@ const EditPeriod = () => {
         }
     }
 
+    const renderDateTimeGroup = (label, dateName, timeName) => (
+        <Grid cols={{ xs: 1, m: 12 }} gap="s" align="center">
+            <GridItem col={{ xs: 1, m: 3 }}>
+                <Typography variant="text-m">{label}</Typography>
+            </GridItem>
+            <GridItem col={{ xs: 1, m: 4 }}>
+                <Controller
+                    name={dateName}
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field }) => <DatePicker size="s" fullWidth required {...field} />}
+                />
+            </GridItem>
+            <GridItem col={{ xs: 1, m: 5 }}>
+                <Controller
+                    name={timeName}
+                    control={control}
+                    render={({ field }) => (
+                        <Input type="time" fullWidth required {...field} size="s" />
+                    )}
+                />
+            </GridItem>
+        </Grid>
+    )
+
     return (
-        <Card className={styles.container} size="m" shadow="m">
-            <Typography variant="heading-xl">Редактировать период</Typography>
-            <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-                <Stack direction="column" gap="m">
-                    {[
-                        ['submissionDate', 'submissionTime', 'Подача с'],
-                        ['submissionEndDate', 'submissionEndTime', 'Подача по'],
-                        ['approvalDate', 'approvalTime', 'Согласование с'],
-                        ['approvalEndDate', 'approvalEndTime', 'Согласование по'],
-                        ['executionDate', 'executionTime', 'Исполнение с'],
-                        ['executionEndDate', 'executionEndTime', 'Исполнение по'],
-                    ].map(([dateField, timeField, label], idx) => (
-                        <Grid key={idx} cols={2} gap="m">
-                            <GridItem col={1}>
+        <div>
+            <Typography variant="heading-xl" className={spacing({ mb: 'm' })}>
+                Редактировать бюджетный период
+            </Typography>
+
+            <Grid cols={{ xs: 1, m: 12 }} gap="xl">
+                <GridItem col={{ xs: 1, m: 12 }}>
+                    <Card size="m" shadow="m">
+                        <form onSubmit={handleSubmit(onSubmit)}>
+                            <Stack direction="column" gap="xl" fullWidth>
+
                                 <Controller
-                                    name={dateField}
+                                    name="name"
                                     control={control}
                                     rules={{ required: true }}
                                     render={({ field }) => (
-                                        <DatePicker label={label} {...field} fullWidth required />
+                                        <Input size="s" label="Название периода" fullWidth required {...field} />
                                     )}
                                 />
-                            </GridItem>
-                            <GridItem col={1}>
-                                <Controller
-                                    name={timeField}
-                                    control={control}
-                                    render={({ field }) => (
-                                        <Input label="Время" type="time" {...field} fullWidth />
-                                    )}
-                                />
-                            </GridItem>
-                        </Grid>
-                    ))}
 
-                    <Button type="submit" variant="contained" color="primary" loading={isUpdating}>
-                        Сохранить изменения
-                    </Button>
-                </Stack>
-            </form>
-        </Card>
+                                {renderDateTimeGroup('Начало подачи', 'submissionDate', 'submissionTime')}
+                                {renderDateTimeGroup('Окончание подачи', 'submissionEndDate', 'submissionEndTime')}
+                                {renderDateTimeGroup('Начало согласования', 'approvalDate', 'approvalTime')}
+                                {renderDateTimeGroup('Окончание согласования', 'approvalEndDate', 'approvalEndTime')}
+                                {renderDateTimeGroup('Начало исполнения', 'executionDate', 'executionTime')}
+                                {renderDateTimeGroup('Окончание исполнения', 'executionEndDate', 'executionEndTime')}
+
+                                <Stack justify="end" gap="m" fullWidth>
+                                    <Button variant="function" onClick={() => navigate(`/periods/${id}`)}>
+                                        Отмена
+                                    </Button>
+                                    <Button type="submit" variant="contained" loading={isLoading}>
+                                        Сохранить изменения
+                                    </Button>
+                                </Stack>
+                            </Stack>
+                        </form>
+                    </Card>
+                </GridItem>
+            </Grid>
+        </div>
     )
 }
 

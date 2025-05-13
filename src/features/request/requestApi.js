@@ -38,7 +38,7 @@ export const requestApi = apiSlice.injectEndpoints({
 
         manageRequest: builder.mutation({
             query: ({ requestId, action, comment }) => ({
-                url: '/api/request/manage',
+                url: '/api/request/HeadOfDepartment',
                 method: 'PATCH',
                 body: { requestId, action, comment },
             }),
@@ -46,7 +46,7 @@ export const requestApi = apiSlice.injectEndpoints({
 
         approveRequest: builder.mutation({
             query: ({ requestId, action, comment }) => ({
-                url: '/api/request/approve',
+                url: '/api/request/Finance',
                 method: 'PATCH',
                 body: { requestId, action, comment },
             }),

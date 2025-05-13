@@ -14,7 +14,7 @@ const ACTION_COLORS = {
     reject: 'error',
     return: 'secondary',
     cancel: 'error',
-    accept: 'primary',
+    approve: 'primary',
     default: 'tertiary',
 }
 
@@ -37,34 +37,18 @@ const RequestActions = ({ request, onStatusChanged }) => {
     const roleClaim = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
     const roleName = user?.[roleClaim]
 
-    const isAdmin = roleName === 'Administration'
-    const isFinance = roleName === 'Finance'
+    // *** Новый код для сравнения по числовым константам ***
+    const userRoleCode = ROLES[roleName]
+    const isAdmin = userRoleCode === ROLES.Administration
 
     const { requestStatus, requestId } = request
     const statusConfig = REQUEST_STATUSES_CONFIG[requestStatus]
-
-
-    console.log('%c[RequestActions]', 'color: #009', {
-        roleName,
-        isAdmin,
-        isFinance,
-        requestStatus,
-        statusConfig,
-    })
-
     if (!statusConfig) return null
+
     const { responsibleRole, actions = [] } = statusConfig
 
-    const canUserAct = isAdmin || roleName === responsibleRole
-
-    console.log('%c[RequestActions::Check]', 'color: #f90', {
-        responsibleRole,
-        canUserAct,
-        actions,
-    })
-
+    const canUserAct = isAdmin || userRoleCode === responsibleRole
     if (!canUserAct || actions.length === 0) return null
-
     return (
         <Stack direction="row" gap="m">
             {actions.map((action) => (

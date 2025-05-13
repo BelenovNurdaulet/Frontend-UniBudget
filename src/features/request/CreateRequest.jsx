@@ -12,6 +12,7 @@ import { Button } from '@ozen-ui/kit/ButtonNext'
 import { Card } from '@ozen-ui/kit/Card'
 import { FilePicker } from '@ozen-ui/kit/FilePicker'
 import styles from './CreateRequest.module.css'
+import {spacing} from "@ozen-ui/kit/MixSpacing";
 
 const CreateRequestPage = () => {
     const { pushMessage } = useSnackbar()
@@ -57,6 +58,7 @@ const CreateRequestPage = () => {
     }
 
     return (
+
         <Card className={styles.container} size="m">
             <Typography variant="heading-xl">Создание заявки</Typography>
             <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
@@ -110,7 +112,8 @@ const CreateRequestPage = () => {
                 </Stack>
             </form>
         </Card>
-    )
+
+            )
 }
 
 export default CreateRequestPage
