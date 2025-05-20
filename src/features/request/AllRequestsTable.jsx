@@ -14,32 +14,68 @@ import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "
 import {Typography} from "@ozen-ui/kit/Typography";
 import {Card} from "@ozen-ui/kit/Card";
 import {Pagination} from "@ozen-ui/kit/Pagination";
-import {Button} from "@ozen-ui/kit/ButtonNext";
-import {CalendarIcon, DocumentSuccessIcon} from "@ozen-ui/icons";
+
 import {spacing} from "@ozen-ui/kit/MixSpacing";
+import { REQUEST_STATUSES_CONFIG} from "../../utils/status/statusConfig.js";
+import {Tag} from "@ozen-ui/kit/TagNext";
+import {BRANCHES} from "../../utils/branches.js";
+import PeriodSelect from "../../components/PeriodSelect/PeriodSelect.jsx";
+import { useSearchParams } from 'react-router-dom';
 
 const AllRequestsTable = () => {
+
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'Created':
+            case 'ReturnToCreator':
+            case 'ReturnToReviewer':
+                return 'warning'
+            case 'InReview':
+            case 'Approved':
+                return 'info'
+            case 'Submitted':
+                return 'success'
+            case 'Cancelled':
+                return 'error'
+            default:
+                return 'default'
+        }
+    }
+    const [isInitialLoadComplete, setIsInitialLoadComplete] = useState(false);
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
-    const [selectedPeriodId, setSelectedPeriodId] = useState('');
+    const [searchParams] = useSearchParams();
+    const initialPeriodIdFromUrl = searchParams.get('periodId') || '';
+    const [selectedPeriodId, setSelectedPeriodId] = useState(initialPeriodIdFromUrl);
+
     const [searchName, setSearchName] = useState('');
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
 
-    const { data: periodsData, isLoading: isPeriodsLoading } = useGetPeriodsQuery({ PageNumber: 1, PageSize: 100 });
+    const { data: periodsData } = useGetPeriodsQuery({ PageNumber: 1, PageSize: 100 });
     const { data, isLoading, isError, refetch } = useGetRequestsQuery({
         PageNumber: page + 1,
         PageSize: pageSize,
         PeriodId: selectedPeriodId ? Number(selectedPeriodId) : undefined,
     });
 
-    useEffect(() => {
-        refetch();
-    }, [page, pageSize, selectedPeriodId, refetch]);
 
     const periods = Array.isArray(periodsData?.items) ? periodsData.items : [];
     const { requests = [], totalCount = 0 } = data || {};
+    useEffect(() => {
+        if (periods.length > 0 && !initialPeriodIdFromUrl && !selectedPeriodId) {
+            setSelectedPeriodId(String(periods[0].id));
+            setIsInitialLoadComplete(true);
+        } else if (initialPeriodIdFromUrl && !isInitialLoadComplete) {
+            setIsInitialLoadComplete(true);
+        }
+    }, [periods, selectedPeriodId, initialPeriodIdFromUrl, isInitialLoadComplete]);
 
+    useEffect(() => {
+        if (isInitialLoadComplete) {
+            refetch();
+        }
+    }, [page, pageSize, selectedPeriodId, refetch, isInitialLoadComplete]);
     if (isLoading) {
         return (
             <div className={styles.loaderWrapper}>
@@ -58,6 +94,7 @@ const AllRequestsTable = () => {
         );
     }
 
+
     return (
         <div>
 
@@ -66,40 +103,16 @@ const AllRequestsTable = () => {
                 </Typography>
             <Stack direction="column" gap="xs" fullWidth>
             <Card size="m" shadow="m">
-                <Stack gap="l" align="center" justify="spaceBetween"  fullWidth>
-                    <Select
-                        label="Бюджетный период"
-                        placeholder={isPeriodsLoading ? 'Загрузка периодов...' : 'Выберите период'}
-                        value={selectedPeriodId}
-                        onChange={setSelectedPeriodId}
-                        fullWidth
-                        renderValue={() => {
-                            const selected = periods.find((p) => String(p.id) === selectedPeriodId);
-                            return selected
-                                ? `Период №${selected.id} — ${getFormattedDate(selected.createdAt)}`
-                                : '';
-                        }}
-                    >
-                        {periods.length > 0 ? (
-                            periods.map((period) => (
-                                <Option key={period.id} value={String(period.id)}>
-                                    Период №{period.id} — {getFormattedDate(period.createdAt)}
-                                </Option>
-                            ))
-                        ) : (
-                            <Option disabled value="">
-                                {isPeriodsLoading ? 'Загрузка...' : 'Нет доступных периодов'}
-                            </Option>
-                        )}
-                    </Select>
-                    <Stack gap="xl">
-                        <Button  iconLeft={DocumentSuccessIcon }>
-                            Cформировать документ
-                        </Button>
-                    </Stack>
+
+                <PeriodSelect
+                    selectedPeriodId={selectedPeriodId}
+                    setSelectedPeriodId={(id) => {
+                        setSelectedPeriodId(id);
+                        setPage(0);
+                    }}
+                />
 
 
-                </Stack>
             </Card>
 
             <Card size="m" shadow="m">
@@ -136,13 +149,13 @@ const AllRequestsTable = () => {
 
 
                 <TableContainer height="400px">
-                    <Table size="m" divider="row" stickyHeader fullWidth>
+                    <Table size="m" divider="row" stickyHeader striped fullWidth>
                         <TableHead>
                             <TableRow>
-                                <TableCell>ID</TableCell>
                                 <TableCell>Заголовок</TableCell>
-                                <TableCell>Описание</TableCell>
                                 <TableCell>Сумма</TableCell>
+                                <TableCell>Подразделение</TableCell>
+                                <TableCell>Статус</TableCell>
                                 <TableCell>Дата создания</TableCell>
                                 <TableCell align="center">Действия</TableCell>
                             </TableRow>
@@ -156,11 +169,19 @@ const AllRequestsTable = () => {
                                 </TableRow>
                             ) : (
                                 requests.map((item) => (
-                                    <TableRow key={item.id}>
-                                        <TableCell>{item.id}</TableCell>
+                                    <TableRow >
                                         <TableCell>{item.title}</TableCell>
-                                        <TableCell>{item.description}</TableCell>
-                                        <TableCell>{item.amount}</TableCell>
+                                        <TableCell>{item.amount} ₸</TableCell>
+                                        <TableCell>
+                                            {BRANCHES[item.branchId] || '—'}
+                                            </TableCell>
+
+                                        <TableCell>
+                                            <Tag
+                                            color={getStatusColor(item.requestStatus)}
+                                            size="s"
+                                            label={REQUEST_STATUSES_CONFIG[item.requestStatus]?.name || item.requestStatus}
+                                        /></TableCell>
                                         <TableCell>{getFormattedDate(item.createdAt)}</TableCell>
                                         <TableCell align="center">
                                             <RouterLink to={`/request/${item.id}`}>Подробнее</RouterLink>

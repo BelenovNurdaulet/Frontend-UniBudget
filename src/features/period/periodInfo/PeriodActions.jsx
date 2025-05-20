@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { selectUser } from '../../auth/authSlice'
 import { useLazyGetPeriodExcelQuery } from '../periodApi'
 import { saveAs } from 'file-saver'
-import {DownloadFileIcon, EditIcon} from "@ozen-ui/icons";
+import { DownloadFileIcon, EditIcon } from "@ozen-ui/icons"
 
 const PeriodActions = ({ period }) => {
     const user = useSelector(selectUser)
@@ -29,16 +29,15 @@ const PeriodActions = ({ period }) => {
             console.error('Ошибка при скачивании Excel:', e)
         }
     }
+
     const isExecutionFinished = new Date(period.executionEndDate) < new Date()
     const showDownload = canDownload && isExecutionFinished
 
-    if (!isAdmin && !canDownload) return null
 
     return (
         <Stack direction="row" gap="s">
             {isAdmin && (
                 <Button
-
                     color="primary"
                     size="s"
                     onClick={handleEdit}
@@ -47,9 +46,8 @@ const PeriodActions = ({ period }) => {
                     Редактировать
                 </Button>
             )}
-            {showDownload  && (
+            {showDownload && (
                 <Button
-
                     color="primary"
                     size="s"
                     onClick={handleDownload}
@@ -58,7 +56,26 @@ const PeriodActions = ({ period }) => {
                     Сформировать документ
                 </Button>
             )}
+            {canDownload && (
+                <Button
+                    color="primary"
+                    size="s"
+                    onClick={() => navigate(`/all-requests?periodId=${period.id}`)}
+                    iconLeft={DownloadFileIcon}
+                >
+                    Просмотреть заявки
+                </Button>
+            )}
+            <Button
+                color="primary"
+                size="s"
+                onClick={() => navigate(`/my-requests?periodId=${period.id}`)}
+                iconLeft={DownloadFileIcon}
+            >
+                Мои заявки
+            </Button>
         </Stack>
+
     )
 }
 

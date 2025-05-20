@@ -12,6 +12,7 @@ import {ErrorFallback} from "../../../components/ErrorFallback/ErrorFallback.jsx
 import {NetworkErrorMessage} from "../../../components/NetworkErrorMessage/NetworkErrorMessage.jsx";
 import {useGetPeriodByIdQuery} from "../periodApi.js";
 import PeriodActions from './PeriodActions'
+import PeriodAnalytics from "./PeriodAnalytics.jsx";
 
 const PeriodInfo = () => {
     const { id } = useParams()
@@ -54,6 +55,9 @@ const PeriodInfo = () => {
             </Grid>
 
             <MainInfoPeriod period={data} />
+
+            <PeriodAnalytics periodId={periodId} targetPeriodId={periodId} />
+
             <PeriodHistory periodHistories={periodHistories} showTotalDuration={false} />
         </div>
     )

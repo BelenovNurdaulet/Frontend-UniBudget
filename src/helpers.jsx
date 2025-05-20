@@ -3,7 +3,7 @@ import {
     UserCircleOutlineIcon,
     PowerOutlineIcon,
     RequestIcon,
-    Suitcase2Icon,
+    Suitcase2Icon, CalendarIcon, PlasticCardAddIcon, BookIcon,
 } from '@ozen-ui/icons';
 
 import AllRequestsTable from './features/request/AllRequestsTable.jsx';
@@ -16,27 +16,28 @@ import UsersList from './features/Users/UsersList.jsx';
 import PeriodInfo from "./features/period/periodInfo/PeriodInfo.jsx";
 import EditPeriod from "./features/period/EditPeriod.jsx";
 import RequestInfo from "./features/request/RequestInfo/RequestInfo.jsx";
+import MyRequestsTable from "./features/request/MyRequestsTable.jsx";
 
 const routes = {
     'all-requests': {
         title: 'Все заявки',
         link: '/all-requests',
         path: '/all-requests',
-        icon: Suitcase2Icon,
+        icon: BookIcon ,
         component: () => <AllRequestsTable />,
     },
     'my-requests': {
         title: 'Мои заявки',
         link: '/my-requests',
         path: '/my-requests',
-        icon: RequestIcon,
-        component: () => <MyIssuancesTable />,
+        icon: BookIcon ,
+        component: () => <MyRequestsTable />,
     },
 
     'create-request': {
         title: 'Создать заявку',
-        link: 'period/create',
-        path: 'period/create',
+        link: '/create-request',
+        path: '/create-request',
         icon: RequestIcon,
         component: () => <CreateRequest />,
     },
@@ -60,14 +61,14 @@ const routes = {
         title: 'Создать период',
         link: '/create-period',
         path: '/create-period',
-        icon: RequestIcon,
+        icon: PlasticCardAddIcon ,
         component: () => <CreatePeriod />,
     },
     periods: {
         title: 'Периоды',
         link: '/periods',
         path: '/periods',
-        icon: DashboardIcon,
+        icon: CalendarIcon ,
         component: () => <Periods />,
     },
     periodInfo: {
@@ -107,10 +108,8 @@ export const navigation = {
         'all-requests',
         'my-requests',
         'create-request',
-        'user-list',
         'create-period',
         'periods',
-        'profile',
         'logout',
     ],
 };

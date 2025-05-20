@@ -10,6 +10,7 @@ import {
 import { Typography } from '@ozen-ui/kit/Typography'
 import getFormattedDate from '../../../../../Frontend/src/utils/getFormattedDate'
 import dayjs from 'dayjs'
+import {REQUEST_STATUSES_CONFIG} from "../../../utils/status/statusConfig.js";
 
 const RequestHistory = ({ historyList }) => {
     if (!Array.isArray(historyList) || historyList.length === 0) {
@@ -54,7 +55,10 @@ const RequestHistory = ({ historyList }) => {
                                 <TableRow key={item.id}>
                                     <TableCell>{item.stepNumber}</TableCell>
                                     <TableCell>{getFormattedDate(item.endDate)}</TableCell>
-                                    <TableCell>{item.requestStatus}</TableCell>
+                                    <TableCell>
+                                        {REQUEST_STATUSES_CONFIG[item.requestStatus]?.name || item.requestStatus}
+                                    </TableCell>
+
                                 </TableRow>
                             ))}
                         </TableBody>

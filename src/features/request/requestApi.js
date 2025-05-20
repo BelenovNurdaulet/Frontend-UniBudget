@@ -18,7 +18,6 @@ export const requestApi = apiSlice.injectEndpoints({
         }),
 
         getRequests: builder.query({
-            // Деструктурируем точно те же поля, что и передаем из компонента:
             query: ({ PeriodId, PageNumber, PageSize }) => {
                 const params = new URLSearchParams()
                 if (PeriodId != null)  params.set('PeriodId', String(PeriodId))
@@ -51,6 +50,40 @@ export const requestApi = apiSlice.injectEndpoints({
                 body: { requestId, action, comment },
             }),
         }),
+
+        downloadRequestFile: builder.mutation({
+            query: ({ RequestId, FileName }) => {
+                const params = new URLSearchParams()
+                if (RequestId) params.set('RequestId', RequestId)
+                if (FileName) params.set('FileName', FileName)
+                return {
+                    url: `/api/request?${params.toString()}`,
+                    method: 'GET',
+                    responseHandler: (response) => response.blob(),
+                }
+            }
+        }),
+
+        uploadRequestFiles: builder.mutation({
+            query: ({ RequestId, Files }) => {
+                const formData = new FormData()
+                formData.append('RequestId', RequestId)
+                Files.forEach(file => formData.append('Files', file))
+                return {
+                    url: '/api/request/files',
+                    method: 'POST',
+                    body: formData,
+                }
+            }
+        }),
+
+        deleteRequestFile: builder.mutation({
+            query: (id) => ({
+                url: `/api/request/files/${id}`,
+                method: 'DELETE',
+            }),
+        }),
+
     }),
 })
 
@@ -61,4 +94,8 @@ export const {
     useGetMyRequestsByPeriodIdQuery,
     useManageRequestMutation,
     useApproveRequestMutation,
+    useDownloadRequestFileMutation,
+
+    useUploadRequestFilesMutation,
+    useDeleteRequestFileMutation,
 } = requestApi

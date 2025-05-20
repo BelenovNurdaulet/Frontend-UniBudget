@@ -12,10 +12,29 @@ import { PageLoader } from '../../../components/PageLoader/PageLoader.jsx'
 import { ErrorFallback } from '../../../components/ErrorFallback/ErrorFallback.jsx'
 import RequestActions from './RequestActions.jsx'
 import { REQUEST_STATUSES_CONFIG } from '../../../utils/status/statusConfig.js'
+import RequestFiles from './RequestFiles' // убедись, что путь указан верно
 
 const RequestInfo = () => {
     const { id } = useParams()
     const { data, isLoading, error, refetch } = useGetRequestByIdQuery(id)
+
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'Created':
+            case 'ReturnToCreator':
+            case 'ReturnToReviewer':
+                return 'warning'
+            case 'InReview':
+            case 'Approved':
+                return 'info'
+            case 'Submitted':
+                return 'success'
+            case 'Cancelled':
+                return 'error'
+            default:
+                return 'default'
+        }
+    }
 
     if (isLoading) return <PageLoader size="l" fullHeight />
     if (error) {
@@ -30,25 +49,23 @@ const RequestInfo = () => {
         )
     }
 
-    const { requestId, requestStatus, requestHistories } = data
+    const {
+        requestId,
+        title,
+        requestStatus,
+        requestHistories,
+        files = [],
+    } = data
+
     const statusName = REQUEST_STATUSES_CONFIG[requestStatus]?.name || 'Неизвестно'
 
     return (
-        <div
-            style={{
-                maxWidth: '900px',
-                margin: '0 auto',
-                padding: '2rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1rem',
-            }}
-        >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <Grid cols={2} align="start">
                 <Grid cols={1}>
                     <GridItem>
                         <Typography variant="heading-xl" className={spacing({ mb: 'm' })}>
-                            Заявка №{requestId}
+                            Заявка "{title}"
                         </Typography>
                         <RequestActions request={data} onStatusChanged={refetch} />
                     </GridItem>
@@ -58,7 +75,7 @@ const RequestInfo = () => {
                         <Tag
                             as="div"
                             size="m"
-                            variant="secondary"
+                            color={getStatusColor(requestStatus)}
                             label={statusName}
                             style={{ width: 'fit-content' }}
                         />
@@ -67,6 +84,15 @@ const RequestInfo = () => {
             </Grid>
 
             <MainInfoRequest request={data} />
+
+            <RequestFiles
+                files={files}
+                requestId={requestId}
+                onFilesChanged={refetch}
+                canManageFiles={true} // логика прав доступа по необходимости
+                canDeleteFiles={true}
+            />
+
             <RequestHistory historyList={requestHistories} />
         </div>
     )

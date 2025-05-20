@@ -1,6 +1,26 @@
 
 import { ROLES } from '../roles'
 
+export const getStatusColor = (status) => {
+  switch (status) {
+    case 'Created':
+    case 'ReturnToCreator':
+    case 'ReturnToReviewer':
+      return 'warning'
+    case 'InReview':
+    case 'Approved':
+      return 'info'
+    case 'Submitted':
+      return 'success'
+    case 'Cancelled':
+      return 'error'
+    default:
+      return 'default'
+  }
+}
+
+
+
 export const REQUEST_STATUSES_CONFIG = {
   Created: {
     name: 'Заявка создана',

@@ -47,6 +47,7 @@ const Periods = () => {
     const { data, isLoading, isError, refetch } = useGetPeriodsQuery({
         PageNumber: page + 1,
         PageSize: pageSize,
+        IsActive: true
     });
 
     useEffect(() => {
@@ -118,7 +119,6 @@ const Periods = () => {
     return (
         <div >
             <Grid cols={2} align="start" className={spacing({ mb: 'l' })}>
-
             <Grid cols={1}>
                     <GridItem>
                         <Typography variant="heading-xl" className={spacing({ mb: 'm' })}>
@@ -177,7 +177,7 @@ const Periods = () => {
                 </Stack>
 
                 <TableContainer height="500px">
-                    <Table size="m" divider="row" stickyHeader fullWidth>
+                    <Table size="m" divider="row" stickyHeader striped fullWidth>
                         <TableHead>
                             <TableRow>
                                 <SortableHeader field="id" label="ID" />

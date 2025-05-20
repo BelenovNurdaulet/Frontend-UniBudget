@@ -19,7 +19,7 @@ export const HEADER_LINKS = [
   },
   {
     text: 'Создать заявку',
-    href: '/create',
+    href: '/create-request',
     roles: [
       ROLES.Administration,
       ROLES.RequestCreator,

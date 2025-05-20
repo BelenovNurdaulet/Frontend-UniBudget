@@ -8,6 +8,8 @@ export const periodApi = apiSlice.injectEndpoints({
                 if (params?.PageNumber) searchParams.set('PageNumber', params.PageNumber)
                 if (params?.PageSize) searchParams.set('PageSize', params.PageSize)
                 if (params?.IsActive !== undefined) searchParams.set('IsActive', params.IsActive)
+                if (params?.StartDate) searchParams.set('StartDate', params.StartDate);
+                if (params?.EndDate) searchParams.set('EndDate', params.EndDate);
 
                 return `/api/period?${searchParams.toString()}`
             },
@@ -55,6 +57,16 @@ export const periodApi = apiSlice.injectEndpoints({
             }),
             keepUnusedDataFor: 0,
         }),
+        getPeriodStatistics: builder.query({
+            query: ({ PeriodId, TargetPeriodId }) => {
+                const searchParams = new URLSearchParams();
+                if (PeriodId !== undefined) searchParams.set('PeriodId', PeriodId);
+                if (TargetPeriodId !== undefined) searchParams.set('TargetPeriodId', TargetPeriodId);
+
+                return `/api/period/statisitcs?${searchParams.toString()}`;
+            },
+            keepUnusedDataFor: 0,
+        }),
 
 
     }),
@@ -66,5 +78,6 @@ export const {
     useUpdatePeriodMutation,
     useGetPeriodByIdQuery,
     useLazyGetPeriodExcelQuery,
+    useGetPeriodStatisticsQuery,
 
 } = periodApi
