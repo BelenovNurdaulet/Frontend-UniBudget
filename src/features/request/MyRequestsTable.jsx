@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useMemo } from 'react';
 import { useGetPeriodsQuery } from '../period/periodApi';
 import { useGetMyRequestsByPeriodIdQuery } from './requestApi';
 import { Loader } from '@ozen-ui/kit/Loader';
@@ -22,45 +23,136 @@ import { Pagination } from '@ozen-ui/kit/Pagination';
 import { spacing } from '@ozen-ui/kit/MixSpacing';
 import { REQUEST_STATUSES_CONFIG } from '../../utils/status/statusConfig';
 import { Tag } from '@ozen-ui/kit/TagNext';
-import { BRANCHES } from '../../utils/branches';
 import PeriodSelect from '../../components/PeriodSelect/PeriodSelect';
 import styles from './AllRequestsTable.module.css';
+import { Button } from '@ozen-ui/kit/ButtonNext';
+import { FilterClearIcon, SortDownIcon, SortUpIcon } from '@ozen-ui/icons';
+import { useSnackbar } from '@ozen-ui/kit/Snackbar';
 
 const MyRequestsTable = () => {
     const [searchParams] = useSearchParams();
     const initialPeriodIdFromUrl = searchParams.get('periodId') || '';
-    const [selectedPeriodId, setSelectedPeriodId] = useState(initialPeriodIdFromUrl);
+    const { pushMessage } = useSnackbar();
 
-    const [isInitialLoadComplete, setIsInitialLoadComplete] = useState(false);
-    const [page, setPage] = useState(0);
-    const [pageSize, setPageSize] = useState(10);
+    const [selectedPeriodId, setSelectedPeriodId] = useState(initialPeriodIdFromUrl);
     const [searchName, setSearchName] = useState('');
+    const [selectedStatus, setSelectedStatus] = useState('');
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
+    const [page, setPage] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
+    const [sortField, setSortField] = useState(null);
+    const [sortOrder, setSortOrder] = useState('asc');
+    const [isInitialLoadComplete, setIsInitialLoadComplete] = useState(false);
+
+    const clearFilters = () => {
+        setSearchName('');
+        setSelectedStatus('');
+        setStartDate(null);
+        setEndDate(null);
+
+    };
+
+    useEffect(() => {
+        const cached = JSON.parse(localStorage.getItem('myRequestsFilters'));
+        if (cached) {
+            if (!initialPeriodIdFromUrl && cached.selectedPeriodId) {
+                setSelectedPeriodId(cached.selectedPeriodId);
+            }
+            setSearchName(cached.searchName || '');
+            setSelectedStatus(cached.selectedStatus || '');
+            setStartDate(cached.startDate ? new Date(cached.startDate) : null);
+            setEndDate(cached.endDate ? new Date(cached.endDate) : null);
+        }
+    }, [initialPeriodIdFromUrl]);
+
+    useEffect(() => {
+        localStorage.setItem('myRequestsFilters', JSON.stringify({
+            selectedPeriodId,
+            searchName,
+            selectedStatus,
+            startDate,
+            endDate,
+        }));
+    }, [selectedPeriodId, searchName, selectedStatus, startDate, endDate]);
 
     const { data: periodsData } = useGetPeriodsQuery({ PageNumber: 1, PageSize: 100 });
-    const { data, isLoading, isError,  error, refetch } = useGetMyRequestsByPeriodIdQuery(
+    const { data, isLoading, isError, error } = useGetMyRequestsByPeriodIdQuery(
         selectedPeriodId ? Number(selectedPeriodId) : undefined,
         { skip: !selectedPeriodId }
     );
 
     const periods = Array.isArray(periodsData?.items) ? periodsData.items : [];
-    const { requests = [], totalCount = requests.length } = data || {};
+    const { requests = [] } = data || {};
 
     useEffect(() => {
         if (periods.length > 0 && !initialPeriodIdFromUrl && !selectedPeriodId) {
             setSelectedPeriodId(String(periods[0].id));
             setIsInitialLoadComplete(true);
-        } else if (initialPeriodIdFromUrl && !isInitialLoadComplete) {
+        } else if (!selectedPeriodId && !isInitialLoadComplete) {
             setIsInitialLoadComplete(true);
         }
     }, [periods, selectedPeriodId, initialPeriodIdFromUrl, isInitialLoadComplete]);
 
     useEffect(() => {
-        if (isInitialLoadComplete && selectedPeriodId) {
-            refetch();
+        if (isInitialLoadComplete && !selectedPeriodId) {
+            pushMessage({
+                title: 'Выберите период чтобы увидеть заявки',
+                status: 'warning',
+            });
         }
-    }, [page, pageSize, selectedPeriodId, refetch, isInitialLoadComplete]);
+    }, [isInitialLoadComplete, selectedPeriodId, pushMessage]);
+
+    const filteredRequests = useMemo(() => {
+        return requests.filter((item) => {
+            const matchesName = searchName
+                ? item.title.toLowerCase().includes(searchName.toLowerCase())
+                : true;
+            const matchesStatus = selectedStatus
+                ? item.requestStatus === selectedStatus
+                : true;
+            const createdAt = new Date(item.createdAt);
+            const matchesStartDate = startDate ? createdAt >= startDate : true;
+            const matchesEndDate = endDate ? createdAt <= endDate : true;
+            return matchesName && matchesStatus && matchesStartDate && matchesEndDate;
+        });
+    }, [requests, searchName, selectedStatus, startDate, endDate]);
+
+    const sortedRequests = useMemo(() => {
+        const sorted = [...filteredRequests];
+        if (!sortField) return sorted;
+        return sorted.sort((a, b) => {
+            let aVal = a[sortField];
+            let bVal = b[sortField];
+            if (aVal == null) aVal = '';
+            if (bVal == null) bVal = '';
+            if (typeof aVal === 'string' && typeof bVal === 'string') {
+                return sortOrder === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+            }
+            return sortOrder === 'asc' ? aVal - bVal : bVal - aVal;
+        });
+    }, [filteredRequests, sortField, sortOrder]);
+
+    const paginatedRequests = sortedRequests.slice(page * pageSize, (page + 1) * pageSize);
+
+    const handleSort = (field) => {
+        if (sortField === field) {
+            setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+        } else {
+            setSortField(field);
+            setSortOrder('asc');
+        }
+    };
+
+    const SortableHeader = ({ field, label }) => (
+        <TableCell onClick={() => handleSort(field)} style={{ cursor: 'pointer' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                {label}
+                {sortField === field &&
+                    (sortOrder === 'asc' ? <SortDownIcon size="s" /> : <SortUpIcon size="s" />)}
+            </span>
+        </TableCell>
+    );
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -98,14 +190,13 @@ const MyRequestsTable = () => {
         );
     }
 
-
     return (
         <div>
             <Typography variant="heading-xl" className={spacing({ mb: 'm' })}>
                 Мои заявки
             </Typography>
             <Stack direction="column" gap="xs" fullWidth>
-                <Card size="m" shadow="m">
+                <Card size="m" shadow="m" borderWidth="none">
                     <PeriodSelect
                         selectedPeriodId={selectedPeriodId}
                         setSelectedPeriodId={(id) => {
@@ -115,62 +206,73 @@ const MyRequestsTable = () => {
                     />
                 </Card>
 
-                <Card size="m" shadow="m">
-                    <Stack
-                        direction="row"
-                        gap="m"
-                        align="end"
-                        justify="spaceBetween"
-                        fullWidth
-                        style={{ marginBottom: 16, flexWrap: 'wrap' }}
-                    >
+                <Card size="m" shadow="m" borderWidth="none">
+                    <Stack direction="row" gap="m" align="end" fullWidth wrap>
                         <Input
                             label="Поиск по названию"
                             value={searchName}
                             onChange={(e) => setSearchName(e.target.value)}
-                            style={{ flex: '1 1 60%' }}
+                            style={{ flex: '1 1 0', minWidth: 180 }}
                         />
-                        <Stack direction="row" gap="m" align="end" style={{ flex: '1 1 35%', minWidth: 280 }}>
-                            <DatePicker
-                                label="Дата начала"
-                                value={startDate}
-                                onChange={setStartDate}
-                                fullWidth
-                            />
-                            <DatePicker
-                                label="Дата окончания"
-                                value={endDate}
-                                onChange={setEndDate}
-                                fullWidth
-                            />
-                        </Stack>
+                        <Select
+                            label="Статус"
+                            value={selectedStatus}
+                            onChange={setSelectedStatus}
+                            style={{ flex: '1 1 0', minWidth: 180 }}
+                        >
+                            {Object.entries(REQUEST_STATUSES_CONFIG).map(([key, config]) => (
+                                <Option key={key} value={key}>
+                                    {config.name}
+                                </Option>
+                            ))}
+                        </Select>
+                        <DatePicker
+                            label="Дата начала"
+                            value={startDate}
+                            onChange={setStartDate}
+                            maxDate={endDate || undefined}
+                            style={{ flex: '1 1 0', minWidth: 180 }}
+                        />
+                        <DatePicker
+                            label="Дата окончания"
+                            value={endDate}
+                            onChange={setEndDate}
+                            minDate={startDate || undefined}
+                            style={{ flex: '1 1 0', minWidth: 180 }}
+                        />
+                        <Button
+                            color="error"
+                            iconLeft={FilterClearIcon}
+                            onClick={clearFilters}
+                            style={{ flex: '1 1 0', minWidth: 180 }}
+                        >
+                            Очистить фильтры
+                        </Button>
                     </Stack>
 
                     <TableContainer height="500px">
                         <Table size="m" divider="row" stickyHeader fullWidth>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Заголовок</TableCell>
-                                    <TableCell>Сумма</TableCell>
-                                    <TableCell>Подразделение</TableCell>
-                                    <TableCell>Статус</TableCell>
-                                    <TableCell>Дата создания</TableCell>
+                                    <SortableHeader field="title" label="Заголовок" />
+                                    <SortableHeader field="amount" label="Сумма" />
+                                    <SortableHeader field="requestStatus" label="Статус" />
+                                    <SortableHeader field="createdAt" label="Дата создания" />
                                     <TableCell align="center">Действия</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {requests.length === 0 ? (
+                                {paginatedRequests.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={6} align="center">
+                                        <TableCell colSpan={5} align="center">
                                             Нет заявок
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    requests.map((item) => (
+                                    paginatedRequests.map((item) => (
                                         <TableRow key={item.id}>
                                             <TableCell>{item.title}</TableCell>
                                             <TableCell>{item.amount} ₸</TableCell>
-                                            <TableCell>{BRANCHES[item.branchId] || '—'}</TableCell>
                                             <TableCell>
                                                 <Tag
                                                     color={getStatusColor(item.requestStatus)}
@@ -188,18 +290,10 @@ const MyRequestsTable = () => {
                             </TableBody>
                         </Table>
                     </TableContainer>
-
                 </Card>
             </Stack>
 
-
-            <Stack
-                direction="row"
-                justify="end"
-                align="center"
-                gap="m"
-                style={{ marginTop: 16, width: '100%' }}
-            >
+            <Stack direction="row" justify="end" align="center" gap="m" style={{ marginTop: 16, width: '100%' }}>
                 <Select
                     size="s"
                     label="Кол-во записей"
@@ -217,7 +311,7 @@ const MyRequestsTable = () => {
                 <Pagination
                     page={page}
                     pageSize={pageSize}
-                    totalCount={totalCount}
+                    totalCount={sortedRequests.length}
                     onPageChange={setPage}
                     size="s"
                 />

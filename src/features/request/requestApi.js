@@ -34,12 +34,18 @@ export const requestApi = apiSlice.injectEndpoints({
                 if (Status) params.set('Status', Status)
                 if (BranchId != null) params.set('BranchId', String(BranchId))
                 if (StartDate) params.set('StartDate', StartDate)
-                if (EndDate) params.set('EndDate', EndDate)
+
+                const defaultEndDate = new Date()
+                defaultEndDate.setDate(defaultEndDate.getDate() + 1)
+
+                params.set('EndDate', EndDate || defaultEndDate.toISOString())
+
                 return `/api/request?${params.toString()}`
             },
-        refetchOnMountOrArgChange: true,
+            refetchOnMountOrArgChange: true,
             keepUnusedDataFor: 0,
         }),
+
 
         getMyRequestsByPeriodId: builder.query({
             query: (periodId) => `/api/request/${periodId}/my`,

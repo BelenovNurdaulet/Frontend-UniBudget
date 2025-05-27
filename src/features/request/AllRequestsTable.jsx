@@ -3,7 +3,7 @@ import { useGetRequestsQuery } from './requestApi';
 import { useGetPeriodsQuery } from '../period/periodApi';
 import { useGetReferenceQuery } from '../reference/referenceApi';
 import { useSelector } from 'react-redux';
-import { selectBranches, selectStatuses } from '../reference/referenceSlice';
+import { selectBranches } from '../reference/referenceSlice';
 import { Loader } from '@ozen-ui/kit/Loader';
 import styles from './AllRequestsTable.module.css';
 import { Link as RouterLink, useSearchParams } from 'react-router-dom';
@@ -121,7 +121,7 @@ const AllRequestsTable = () => {
     const { data: periodsData } = useGetPeriodsQuery({ PageNumber: 1, PageSize: 100 });
     useGetReferenceQuery();
     const branches = useSelector(selectBranches);
-    const statuses = useSelector(selectStatuses);
+
 
     const { data, isLoading, isError } = useGetRequestsQuery(
         {
@@ -253,17 +253,19 @@ const AllRequestsTable = () => {
                             onChange={setSelectedStatus}
                             style={{ flex: '1 1 0', minWidth: 180 }}
                         >
-                            {statuses.map((status) => (
-                                <Option key={status} value={status}>
-                                    {status}
+                            {Object.entries(REQUEST_STATUSES_CONFIG).map(([statusKey, config]) => (
+                                <Option key={statusKey} value={statusKey}>
+                                    {config.name}
                                 </Option>
                             ))}
                         </Select>
+
 
                         <DatePicker
                             label="Дата начала"
                             value={startDate}
                             onChange={setStartDate}
+                            maxDate={endDate || undefined}
                             style={{ flex: '1 1 0', minWidth: 180 }}
                         />
 
@@ -271,8 +273,10 @@ const AllRequestsTable = () => {
                             label="Дата окончания"
                             value={endDate}
                             onChange={setEndDate}
+                            minDate={startDate || undefined}
                             style={{ flex: '1 1 0', minWidth: 180 }}
                         />
+
 
                         <Button
                             color="error"
