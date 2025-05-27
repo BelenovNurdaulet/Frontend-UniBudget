@@ -7,6 +7,7 @@ import s from './AppBar.module.css';
 
 import { useAppBar } from './useAppBar';
 import {AppBarSwitcher} from "./components/AppBarSwitcher/AppBarSwitcher.jsx";
+import {ROLES} from "../../utils/roles.jsx";
 
 export const AppBar = ({ children }) => {
   const [openState, expandState] = useAppBar();
@@ -14,8 +15,7 @@ export const AppBar = ({ children }) => {
   const [open, { off: openOff }] = openState;
   const { m } = useBreakpoints();
   const isMobile = !m;
-  console.log('[AppBar] openState:', openState);
-  console.log('[AppBar] expandState:', expandState);
+
   return (
       <>
         {!isMobile && (

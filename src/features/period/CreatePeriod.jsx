@@ -1,18 +1,17 @@
-import { useForm, Controller } from 'react-hook-form'
-import { useCreatePeriodMutation } from './periodApi'
-import { Typography } from '@ozen-ui/kit/Typography'
-import { Button } from '@ozen-ui/kit/ButtonNext'
-import { Input } from '@ozen-ui/kit/Input'
-import { DatePicker } from '@ozen-ui/kit/DatePicker'
-import { useSnackbar } from '@ozen-ui/kit/Snackbar'
-import { Card } from '@ozen-ui/kit/Card'
-import { Stack } from '@ozen-ui/kit/Stack'
-import { Grid, GridItem } from '@ozen-ui/kit/Grid'
-import { spacing } from '@ozen-ui/kit/MixSpacing'
-import { useNavigate } from 'react-router-dom'
+import {useForm, Controller} from 'react-hook-form'
+import {useCreatePeriodMutation} from './periodApi'
+import {Typography} from '@ozen-ui/kit/Typography'
+import {Button} from '@ozen-ui/kit/ButtonNext'
+import {Input} from '@ozen-ui/kit/Input'
+import {DatePicker} from '@ozen-ui/kit/DatePicker'
+import {useSnackbar} from '@ozen-ui/kit/Snackbar'
+import {Card} from '@ozen-ui/kit/Card'
+import {Stack} from '@ozen-ui/kit/Stack'
+import {Grid, GridItem} from '@ozen-ui/kit/Grid'
+import {useNavigate} from 'react-router-dom'
 
 const CreatePeriod = () => {
-    const { control, handleSubmit } = useForm({
+    const {control, handleSubmit} = useForm({
         defaultValues: {
             name: '',
             submissionDate: '',
@@ -30,8 +29,8 @@ const CreatePeriod = () => {
         },
     })
 
-    const { pushMessage } = useSnackbar()
-    const [createPeriod, { isLoading }] = useCreatePeriodMutation()
+    const {pushMessage} = useSnackbar()
+    const [createPeriod, {isLoading}] = useCreatePeriodMutation()
     const navigate = useNavigate()
 
     const onSubmit = async (values) => {
@@ -50,7 +49,7 @@ const CreatePeriod = () => {
             }
 
             await createPeriod(payload).unwrap()
-            pushMessage({ title: 'Успех', description: 'Период успешно создан', status: 'success' })
+            pushMessage({title: 'Успех', description: 'Период успешно создан', status: 'success'})
             navigate('/periods')
         } catch (err) {
             pushMessage({
@@ -61,78 +60,103 @@ const CreatePeriod = () => {
         }
     }
 
-    const renderDateTimeGroup = (label, dateName, timeName) => (
-        <Grid cols={{ xs: 1, m: 12 }} gap="s" align="center">
-            <GridItem col={{ xs: 1, m: 3 }}>
-                <Typography variant="text-m">{label}</Typography>
-            </GridItem>
-            <GridItem col={{ xs: 1, m: 4 }}>
-                <Controller
+    const renderDateTimeGroup = (dateName, timeName) => (
 
-                    name={dateName}
-                    control={control}
-                    rules={{ required: true }}
-                    render={({ field }) => <DatePicker size="s" fullWidth required {...field} />}
-                />
-            </GridItem>
-            <GridItem col={{ xs: 1, m: 5 }}>
-                <Controller
-                    name={timeName}
-                    control={control}
-                    render={({ field }) => (
-                        <Input type="time" fullWidth required {...field} size="s" />
-                    )}
-                />
-            </GridItem>
-        </Grid>
+        <Stack direction="row" gap="l">
+            <Controller
+                name={dateName}
+                control={control}
+                rules={{required: true}}
+                render={({field}) =>
+                    <DatePicker required {...field} fullWidth/>}
+            />
+            <Controller
+                name={timeName}
+                control={control}
+                render={({field}) =>
+                    <Input type="time" required {...field} fullWidth/>}
+            />
+        </Stack>
+
     )
+
 
     return (
-        <div>
-            <Typography variant="heading-xl" className={spacing({ mb: 'm' })}>
-                Cоздать бюджетный период
-            </Typography>
+        <Stack direction="column" gap="l" fullWidth>
+            <Typography variant="heading-xl">Создание периода</Typography>
 
-        <Grid cols={{ xs: 1, m: 12 }} gap="xl">
-            <GridItem col={{ xs: 1, m: 12 }}>
+            <Card borderWidth="none">
+                <Grid cols={3}>
+                    <GridItem col={{xs: 3, m: 1}}>
+                        <Typography variant="text-xl_1">Название</Typography>
+                    </GridItem>
+                    <GridItem col={{xs: 3, m: 2}}>
+                        <Controller
+                            name="name"
+                            control={control}
+                            rules={{required: true}}
+                            render={({field}) => (
+                                <Input label="Название периода" fullWidth required {...field} />
+                            )}
+                        />
+                    </GridItem>
+                </Grid>
+            </Card>
 
-                <Card size="m" shadow="m">
-                    <form onSubmit={handleSubmit(onSubmit)}>
-                        <Stack direction="column" gap="xl" fullWidth>
+            <Card borderWidth="none">
+                <Stack direction="column" gap="l" fullWidth>
+                    <Grid cols={3}>
+                        <GridItem col={{xs: 3, m: 1}}>
+                            <Typography variant="text-xl_1">Период подачи заявок</Typography>
+                        </GridItem>
+                        <GridItem col={{xs: 3, m: 2}} as={Stack} gap="l" direction="column">
+                            {renderDateTimeGroup('submissionDate', 'submissionTime')}
+                            {renderDateTimeGroup('submissionEndDate', 'submissionEndTime')}
+                        </GridItem>
+                    </Grid>
+                </Stack>
+            </Card>
 
+            <Card borderWidth="none">
+                <Stack direction="column" gap="l" fullWidth>
+                    <Grid cols={3}>
+                        <GridItem col={{xs: 3, m: 1}}>
+                            <Typography variant="text-xl">Период согласования руководителей</Typography>
+                        </GridItem>
+                        <GridItem col={{xs: 3, m: 2}} as={Stack} gap="l" direction="column">
+                            {renderDateTimeGroup('approvalDate', 'approvalTime')}
+                            {renderDateTimeGroup('approvalEndDate', 'approvalEndTime')}
+                        </GridItem>
+                    </Grid>
+                </Stack>
+            </Card>
 
-                            <Controller
-                                name="name"
-                                control={control}
-                                rules={{ required: true }}
-                                render={({ field }) => (
-                                    <Input size="s" label="Название периода" fullWidth required {...field} />
-                                )}
-                            />
+            <Card borderWidth="none">
 
-                            {renderDateTimeGroup('Начало подачи', 'submissionDate', 'submissionTime')}
-                            {renderDateTimeGroup('Окончание подачи', 'submissionEndDate', 'submissionEndTime')}
-                            {renderDateTimeGroup('Начало согласования', 'approvalDate', 'approvalTime')}
-                            {renderDateTimeGroup('Окончание согласования', 'approvalEndDate', 'approvalEndTime')}
-                            {renderDateTimeGroup('Начало исполнения', 'executionDate', 'executionTime')}
-                            {renderDateTimeGroup('Окончание исполнения', 'executionEndDate', 'executionEndTime')}
+                <Stack direction="column" gap="l" fullWidth>
+                    <Grid cols={3}>
+                        <GridItem col={{xs: 3, m: 1}}>
+                            <Typography variant="text-xl_1">Период согласования финансистов</Typography>
+                        </GridItem>
+                        <GridItem col={{xs: 3, m: 2}} as={Stack} gap="l" direction="column">
+                            {renderDateTimeGroup('executionDate', 'executionTime')}
+                            {renderDateTimeGroup('executionEndDate', 'executionEndTime')}
+                        </GridItem>
+                    </Grid>
+                </Stack>
 
-                            <Stack justify="end" gap="m" fullWidth>
-                                <Button variant="function" onClick={() => navigate('/periods')}>
-                                    Отмена
-                                </Button>
-                                <Button type="submit" variant="contained" loading={isLoading}>
-                                    Создать период
-                                </Button>
-                            </Stack>
-                        </Stack>
-                    </form>
-                </Card>
-            </GridItem>
-        </Grid>
-        </div>
+            </Card>
 
-    )
-}
+            <Stack justify="end" gap="m">
+                <Button variant="function" onClick={() => navigate('/periods')}>
+                    Отмена
+                </Button>
+                <Button color="primary" onClick={handleSubmit(onSubmit)} loading={isLoading}>
+                    Создать период
+                </Button>
+            </Stack>
+        </Stack>
+    );
+};
 
-export default CreatePeriod
+export default CreatePeriod;

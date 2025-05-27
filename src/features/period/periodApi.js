@@ -19,6 +19,7 @@ export const periodApi = apiSlice.injectEndpoints({
             }),
             refetchOnMountOrArgChange: true,
             keepUnusedDataFor: 0,
+
         }),
 
 
@@ -42,6 +43,7 @@ export const periodApi = apiSlice.injectEndpoints({
             }),
             refetchOnMountOrArgChange: true,
             keepUnusedDataFor: 0,
+
         }),
 
         getPeriodById: builder.query({

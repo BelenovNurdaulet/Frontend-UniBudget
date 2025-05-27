@@ -14,10 +14,8 @@ const PeriodActions = ({ period }) => {
 
     const roleClaim = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
     const role = user?.[roleClaim]
-
     const isAdmin = role === 'Administration'
     const canDownload = ['Administration', 'Finance'].includes(role)
-
     const handleEdit = () => navigate(`/periods/${period.id}/edit`)
 
     const handleDownload = async () => {

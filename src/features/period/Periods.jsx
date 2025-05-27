@@ -28,7 +28,6 @@ import { Link as RouterLink } from 'react-router-dom';
 import getFormattedDate from '../../utils/getFormattedDate';
 import {spacing} from "@ozen-ui/kit/MixSpacing";
 import {Grid, GridItem} from "@ozen-ui/kit/Grid";
-import PeriodActions from "./periodInfo/PeriodActions.jsx";
 import {Button} from "@ozen-ui/kit/ButtonNext";
 import {useNavigate} from "react-router";
 
@@ -214,28 +213,28 @@ const Periods = () => {
                     </Table>
                 </TableContainer>
 
-                <Stack direction="row" justify="end" align="center" gap="m"   style={{ marginTop: 16, width: '100%' }}>
-                    <Select
-                        size="s"
-                        label="Кол-во записей"
-                        value={pageSize}
-                        onChange={(value) => setPageSize(Number(value))}
-                    >
-                        <Option value={10}>10</Option>
-                        <Option value={20}>20</Option>
-                        <Option value={50}>50</Option>
-                        <Option value={100}>100</Option>
-                    </Select>
-                    <Pagination
-                        page={page}
-                        pageSize={pageSize}
-                        totalCount={totalCount}
-                        onPageChange={(newPage) => setPage(newPage)}
-                        size="s"
-                    />
-                </Stack>
-            </Card>
 
+            </Card>
+            <Stack direction="row" justify="end" align="center" gap="m"   style={{ marginTop: 16, width: '100%' }}>
+                <Select
+                    size="s"
+                    label="Кол-во записей"
+                    value={pageSize}
+                    onChange={(value) => setPageSize(Number(value))}
+                >
+                    <Option value={10}>10</Option>
+                    <Option value={20}>20</Option>
+                    <Option value={50}>50</Option>
+                    <Option value={100}>100</Option>
+                </Select>
+                <Pagination
+                    page={page}
+                    pageSize={pageSize}
+                    totalCount={totalCount}
+                    onPageChange={(newPage) => setPage(newPage)}
+                    size="s"
+                />
+            </Stack>
 
         </div>
     );

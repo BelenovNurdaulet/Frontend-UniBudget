@@ -1,33 +1,28 @@
-import { Navigate, Outlet, useLocation } from 'react-router'
-import { useSelector } from 'react-redux'
-import { selectIsAuthenticated, selectUser } from '../features/auth/authSlice'
-import {ROLES} from "../utils/roles.jsx";
+// src/routes/ProtectedRoute.jsx
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useSelector }              from 'react-redux';
+import {
+    selectIsAuthenticated,
+    selectUser
+} from '../features/auth/authSlice';
 
+const roleClaim = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
 
-
-const ProtectedRoute = ({ allowedRoles }) => {
-    const user = useSelector(selectUser)
-    const isAuthenticated = useSelector(selectIsAuthenticated)
-    const location = useLocation()
-
-
+const ProtectedRoute = ({ allowedRoles = [] }) => {
+    const isAuthenticated = useSelector(selectIsAuthenticated);
+    const user            = useSelector(selectUser);
+    const location        = useLocation();
 
     if (!isAuthenticated) {
-        return <Navigate to="/login" state={{ from: location }} replace />
+        return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
-    const roleClaim  = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
-    const roleName   = user?.[roleClaim]      // "Administration"
-    const userRole   = ROLES[roleName]
+    const userRole = user?.[roleClaim];
 
-
-    if (userRole === undefined || !allowedRoles.includes(userRole)) {
-        return <Navigate to="/unauthorized" replace />
+    if (!userRole || !allowedRoles.includes(userRole)) {
+        return <Navigate to="/unauthorized" replace />;
     }
+    return <Outlet />;
+};
 
-
-
-    return <Outlet />
-}
-
-export default ProtectedRoute
+export default ProtectedRoute;

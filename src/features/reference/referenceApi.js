@@ -2,7 +2,7 @@ import { apiSlice } from '../../app/api/apiSlice'
 
 const CACHE_KEY = 'referenceCache'
 const CACHE_TIME_KEY = 'referenceCacheTime'
-const ONE_DAY = 24 * 60 * 60 * 1000
+const ONE_DAY =1
 
 export const referenceApi = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
@@ -19,7 +19,6 @@ export const referenceApi = apiSlice.injectEndpoints({
                         const wrapper = JSON.parse(cached)
                         return { data: wrapper }
                     }
-
 
                     const result = await fetchWithBQ('/api/references')
                     if (result.error) {

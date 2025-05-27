@@ -52,6 +52,7 @@ export const AppProvider = ({ children }) => {
         <SnackbarProvider
             lifetime={10000}
             anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            maxMessages={3}
         >
           <AppContext.Provider
               value={{

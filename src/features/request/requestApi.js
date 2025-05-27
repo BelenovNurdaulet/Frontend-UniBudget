@@ -17,15 +17,27 @@ export const requestApi = apiSlice.injectEndpoints({
             }),
         }),
 
+        updateRequest: builder.mutation({
+            query: (body) => ({
+                url: '/api/request',
+                method: 'PUT',
+                body,
+            }),
+        }),
+
         getRequests: builder.query({
-            query: ({ PeriodId, PageNumber, PageSize }) => {
+            query: ({ PeriodId, PageNumber, PageSize, Status, BranchId, StartDate, EndDate }) => {
                 const params = new URLSearchParams()
                 if (PeriodId != null)  params.set('PeriodId', String(PeriodId))
                 if (PageNumber != null) params.set('PageNumber', String(PageNumber))
                 if (PageSize != null)   params.set('PageSize', String(PageSize))
+                if (Status) params.set('Status', Status)
+                if (BranchId != null) params.set('BranchId', String(BranchId))
+                if (StartDate) params.set('StartDate', StartDate)
+                if (EndDate) params.set('EndDate', EndDate)
                 return `/api/request?${params.toString()}`
             },
-            refetchOnMountOrArgChange: true,
+        refetchOnMountOrArgChange: true,
             keepUnusedDataFor: 0,
         }),
 
@@ -48,6 +60,15 @@ export const requestApi = apiSlice.injectEndpoints({
                 url: '/api/request/Finance',
                 method: 'PATCH',
                 body: { requestId, action, comment },
+            }),
+        }),
+
+        // новый endpoint для Creator
+        creatorRequest: builder.mutation({
+            query: ({ requestId, action, title, description, comment, amount }) => ({
+                url: '/api/request/Creator',
+                method: 'PATCH',
+                body: { requestId, action, title, description, comment, amount },
             }),
         }),
 
@@ -83,6 +104,23 @@ export const requestApi = apiSlice.injectEndpoints({
                 method: 'DELETE',
             }),
         }),
+        actOnRequest: builder.mutation({
+            query: ({ requestId, action, comment, requestStatus }) => {
+                const endpointMap = {
+                    InReview: 'HeadOfDepartment',
+                    Approved: 'Finance',
+                };
+
+                const target = endpointMap[requestStatus] || 'HeadOfDepartment';
+
+                return {
+                    url: `/api/request/${target}`,
+                    method: 'PATCH',
+                    body: { requestId, action, comment },
+                };
+            },
+        }),
+
 
     }),
 })
@@ -90,12 +128,14 @@ export const requestApi = apiSlice.injectEndpoints({
 export const {
     useGetRequestByIdQuery,
     useCreateRequestMutation,
+    useUpdateRequestMutation,
     useGetRequestsQuery,
     useGetMyRequestsByPeriodIdQuery,
     useManageRequestMutation,
     useApproveRequestMutation,
+    useCreatorRequestMutation,
     useDownloadRequestFileMutation,
-
     useUploadRequestFilesMutation,
     useDeleteRequestFileMutation,
+    useActOnRequestMutation,
 } = requestApi

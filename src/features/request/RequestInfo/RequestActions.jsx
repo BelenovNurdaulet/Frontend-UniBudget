@@ -1,14 +1,23 @@
-import { useState } from 'react'
-import { useSelector } from 'react-redux'
-import { selectUser } from '../../auth/authSlice'
-import { useApproveRequestMutation, useManageRequestMutation } from '../requestApi'
-import { REQUEST_STATUSES_CONFIG } from '../../../utils/status/statusConfig'
-import { ROLES } from '../../../utils/roles'
-import { useSnackbar } from '@ozen-ui/kit/Snackbar'
-import { Button } from '@ozen-ui/kit/ButtonNext'
-import { Dialog, DialogHeader, DialogTitle, DialogBody, DialogFooter } from '@ozen-ui/kit/Dialog'
-import { Stack } from '@ozen-ui/kit/Stack'
-import { Input } from '@ozen-ui/kit/Input'
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+
+import { useActOnRequestMutation } from '../requestApi';
+import { REQUEST_STATUSES_CONFIG } from '../../../utils/status/statusConfig';
+import { ROLES } from '../../../utils/rolesConfig';
+import { useSnackbar } from '@ozen-ui/kit/Snackbar';
+import { Button } from '@ozen-ui/kit/ButtonNext';
+import {
+    Dialog,
+    DialogHeader,
+    DialogTitle,
+    DialogBody,
+    DialogFooter
+} from '@ozen-ui/kit/Dialog';
+import { Stack } from '@ozen-ui/kit/Stack';
+import { Input } from '@ozen-ui/kit/Input';
+import { selectUser } from '../../auth/authSlice.js';
+import { useGetPeriodByIdQuery } from '../../period/periodApi.js';
 
 const ACTION_COLORS = {
     reject: 'error',
@@ -16,7 +25,7 @@ const ACTION_COLORS = {
     cancel: 'error',
     approve: 'primary',
     default: 'tertiary',
-}
+};
 
 const DIALOG_BACKDROP_STYLE = {
     display: 'flex',
@@ -24,148 +33,209 @@ const DIALOG_BACKDROP_STYLE = {
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
     backdropFilter: 'blur(4px)',
-}
+};
 
 const DIALOG_WINDOW_STYLE = {
     maxWidth: '500px',
     width: '100%',
     margin: '0 auto',
-}
+};
 
 const RequestActions = ({ request, onStatusChanged }) => {
-    const user = useSelector(selectUser)
-    const roleClaim = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
-    const roleName = user?.[roleClaim]
+    const navigate = useNavigate();
+    const { pushMessage } = useSnackbar();
+    const user = useSelector(selectUser);
 
-    // *** Новый код для сравнения по числовым константам ***
-    const userRoleCode = ROLES[roleName]
-    const isAdmin = userRoleCode === ROLES.Administration
+    const roleClaim = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
+    const nameClaim = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name';
 
-    const { requestStatus, requestId } = request
-    const statusConfig = REQUEST_STATUSES_CONFIG[requestStatus]
-    if (!statusConfig) return null
+    const roleName = user?.[roleClaim];
+    const userRole = ROLES[roleName];
+    const userName = user?.[nameClaim];
 
-    const { responsibleRole, actions = [] } = statusConfig
+    const {
+        requestId,
+        requestStatus,
+        periodId,
+        creatorName,
+        headOfDepartmentName,
+    } = request;
 
-    const canUserAct = isAdmin || userRoleCode === responsibleRole
-    if (!canUserAct || actions.length === 0) return null
-    return (
-        <Stack direction="row" gap="m">
-            {actions.map((action) => (
-                <ActionButton
-                    key={action.actionName}
-                    requestId={requestId}
-                    actionConfig={action}
-                    useFinanceEndpoint={responsibleRole === ROLES.Finance}
-                    onStatusChanged={onStatusChanged}
-                />
-            ))}
-        </Stack>
-    )
-}
+    const { data: period } = useGetPeriodByIdQuery(periodId);
+
+    const now = new Date();
+    const isInSubmissionPeriod = Boolean(
+        period &&
+        now >= new Date(period.submissionStartDate) &&
+        now <= new Date(period.submissionEndDate)
+    );
 
 
-function ActionButton({ requestId, actionConfig, useFinanceEndpoint, onStatusChanged }) {
-    const [approveRequest, { isLoading: isApproving }] = useApproveRequestMutation()
-    const [manageRequest, { isLoading: isManaging }] = useManageRequestMutation()
-    const { pushMessage } = useSnackbar()
-    const [isDialogOpen, setIsDialogOpen] = useState(false)
-    const [comment, setComment] = useState('')
-    const { actionName, label, requireComment } = actionConfig
+    const isInExecutionPeriod = Boolean(
+        period &&
+        now >= new Date(period.executionStartDate) &&
+        now <= new Date(period.executionEndDate)
+    );
 
-    const isLoading = isApproving || isManaging
-    const buttonColor = ACTION_COLORS[actionName] || ACTION_COLORS.default
+    const isInApprovalPeriod = Boolean(
+        period &&
+        now >= new Date(period.approvalStartDate) &&
+        now <= new Date(period.approvalEndDate)
+    );
+    const canHeadActInPeriod =
+        userRole === ROLES.HeadOfDepartment &&
+        (requestStatus === 'InReview' || requestStatus === 'ReturnToReviewer') &&
+        isInApprovalPeriod;
 
-    const handleClose = () => {
-        setComment('')
-        setIsDialogOpen(false)
-    }
+    const canFinanceActInPeriod =
+        userRole === ROLES.Finance &&
+        requestStatus === 'Approved' &&
+        isInExecutionPeriod;
+
+    const isCreator = userName === creatorName;
+    const isHead =
+        userRole === ROLES.HeadOfDepartment ||
+        userName === headOfDepartmentName;
+
+    const canEdit =
+        (isInSubmissionPeriod && isCreator) ||
+        (requestStatus === 'ReturnToCreator' && isCreator) ||
+        (requestStatus === 'ReturnToReviewer' && isHead);
+
+
+    const statusConfig = REQUEST_STATUSES_CONFIG[requestStatus];
+    const actions = statusConfig?.actions || [];
+    //   const responsibleRole = statusConfig?.responsibleRole;
+
+    const canUserAct =
+        (userRole === ROLES.Administration ||
+            canHeadActInPeriod ||
+            canFinanceActInPeriod) &&
+        actions.length > 0;
+
+    const [actOnRequest, { isLoading: isActing }] = useActOnRequestMutation();
+
+    const [activeAction, setActiveAction] = useState(null);
+    const [comment, setComment] = useState('');
+
+    const openDialog = (action) => {
+        setActiveAction(action);
+        setComment('');
+    };
+    const closeDialog = () => {
+        setActiveAction(null);
+        setComment('');
+    };
 
     const handleSubmit = async () => {
-        const trimmedComment = comment.trim()
-        if (requireComment && !trimmedComment) {
+        const trimmed = comment.trim();
+        if (activeAction.requireComment && !trimmed) {
             pushMessage({
                 title: 'Комментарий обязателен',
-                description: `Пожалуйста введите комментарий для действия "${label}"`,
+                description: `Пожалуйста введите комментарий для действия "${activeAction.label}"`,
                 status: 'warning',
-            })
-            return
+            });
+            return;
         }
 
         const payload = {
             requestId,
-            action: actionName,
-            comment: trimmedComment || '-',
-        }
+            action: activeAction.actionName,
+            comment: trimmed || '-',
+            requestStatus,
+        };
 
         try {
-            if (useFinanceEndpoint) {
-                await approveRequest(payload).unwrap()
-            } else {
-                await manageRequest(payload).unwrap()
-            }
-
+            await actOnRequest(payload).unwrap();
             pushMessage({
                 title: 'Успешно',
                 description: 'Статус заявки изменён',
                 status: 'success',
-            })
-            onStatusChanged?.()
-            handleClose()
+            });
+            onStatusChanged?.();
+            closeDialog();
         } catch (err) {
-            console.error(err)
+            console.error(err);
             pushMessage({
                 title: 'Ошибка',
                 description: err?.data?.error || 'Ошибка изменения статуса',
                 status: 'error',
-            })
+            });
         }
-    }
+    };
 
     return (
-        <>
-            <Button
-                variant="contained"
-                color={buttonColor}
-                size="s"
-                onClick={() => setIsDialogOpen(true)}
-                disabled={isLoading}
-            >
-                {label}
-            </Button>
+        <Stack direction="row" gap="m">
+            {canEdit && (
+                <Button
+                    variant="contained"
+                    color="primary"
+                    size="s"
+                    onClick={() => navigate(`/edit-request/${requestId}`)}
+                >
+                    Редактировать заявку
+                </Button>
+            )}
 
-            <Dialog
-                open={isDialogOpen}
-                onClose={handleClose}
-                size="l"
-                variant="medium"
-                backdropProps={{ style: DIALOG_BACKDROP_STYLE }}
-                windowProps={{ style: DIALOG_WINDOW_STYLE }}
-            >
-                <DialogHeader>
-                    <DialogTitle>{label}</DialogTitle>
-                </DialogHeader>
-                <DialogBody>
-                    <Input
-                        label="Комментарий"
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
-                        required={requireComment}
-                        placeholder={requireComment ? 'Введите комментарий (обязательно)' : 'Введите комментарий'}
-                        fullWidth
-                    />
-                </DialogBody>
-                <DialogFooter>
-                    <Button variant="text" onClick={handleClose} disabled={isLoading}>
-                        Отмена
-                    </Button>
-                    <Button variant="contained" color={buttonColor} onClick={handleSubmit} disabled={isLoading}>
-                        {label}
-                    </Button>
-                </DialogFooter>
-            </Dialog>
-        </>
-    )
-}
+            {canUserAct &&
+                actions.map((action) => {
+                    const color = ACTION_COLORS[action.actionName] || ACTION_COLORS.default;
+                    return (
+                        <Button
+                            key={action.actionName}
+                            variant="contained"
+                            color={color}
+                            size="s"
+                            onClick={() => openDialog(action)}
+                            disabled={isActing}
+                        >
+                            {action.label}
+                        </Button>
+                    );
+                })}
 
-export default RequestActions
+            {activeAction && (
+                <Dialog
+                    open
+                    onClose={closeDialog}
+                    size="l"
+                    variant="medium"
+                    backdropProps={{ style: DIALOG_BACKDROP_STYLE }}
+                    windowProps={{ style: DIALOG_WINDOW_STYLE }}
+                >
+                    <DialogHeader>
+                        <DialogTitle>{activeAction.label}</DialogTitle>
+                    </DialogHeader>
+                    <DialogBody>
+                        <Input
+                            label="Комментарий"
+                            value={comment}
+                            onChange={(e) => setComment(e.target.value)}
+                            required={activeAction.requireComment}
+                            placeholder={
+                                activeAction.requireComment
+                                    ? 'Введите комментарий (обязательно)'
+                                    : 'Введите комментарий'
+                            }
+                            fullWidth
+                        />
+                    </DialogBody>
+                    <DialogFooter>
+                        <Button variant="text" onClick={closeDialog}>
+                            Отмена
+                        </Button>
+                        <Button
+                            variant="contained"
+                            onClick={handleSubmit}
+                            disabled={isActing}
+                        >
+                            {activeAction.label}
+                        </Button>
+                    </DialogFooter>
+                </Dialog>
+            )}
+        </Stack>
+    );
+};
+
+export default RequestActions;

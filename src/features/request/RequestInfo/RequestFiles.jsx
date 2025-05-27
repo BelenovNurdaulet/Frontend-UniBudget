@@ -14,15 +14,25 @@ import {
 } from '@ozen-ui/kit/Table';
 import { useSnackbar } from '@ozen-ui/kit/Snackbar';
 import { useRef } from 'react';
-import { DeleteIcon, DownloadFileIcon, DownloadIcon, UploadIcon } from '@ozen-ui/icons';
 import {
-    useDeleteRequestFileMutation,
+  DeleteIcon,
+  DownloadFileIcon,
+  UploadIcon,
+} from '@ozen-ui/icons';
+
+import {
+  useDeleteRequestFileMutation,
   useDownloadRequestFileMutation,
-    useUploadRequestFilesMutation
-} from "../requestApi.js";
+  useUploadRequestFilesMutation,
+} from '../requestApi.js';
 
-
-const RequestFiles = ({ files, requestId, onFilesChanged, canManageFiles, canDeleteFiles }) => {
+const RequestFiles = ({
+                        files,
+                        requestId,
+                        onFilesChanged,
+                        canManageFiles,
+                        canDeleteFiles,
+                      }) => {
   const { pushMessage } = useSnackbar();
   const fileInputRef = useRef(null);
   const [downloadFile] = useDownloadRequestFileMutation();
@@ -38,7 +48,10 @@ const RequestFiles = ({ files, requestId, onFilesChanged, canManageFiles, canDel
     if (!selectedFiles?.length) return;
 
     try {
-      await uploadFiles({ RequestId: requestId, Files: Array.from(selectedFiles) }).unwrap();
+      await uploadFiles({
+        RequestId: requestId,
+        Files: Array.from(selectedFiles),
+      }).unwrap();
       onFilesChanged?.();
       event.target.value = '';
       pushMessage({
@@ -80,7 +93,10 @@ const RequestFiles = ({ files, requestId, onFilesChanged, canManageFiles, canDel
 
   const handleDownloadFile = async (fileName) => {
     try {
-      const blob = await downloadFile({ RequestId: requestId, FileName: fileName }).unwrap();
+      const blob = await downloadFile({
+        RequestId: requestId,
+        FileName: fileName,
+      }).unwrap();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -101,7 +117,12 @@ const RequestFiles = ({ files, requestId, onFilesChanged, canManageFiles, canDel
 
   return (
       <>
-        <Stack direction="row" align="center" gap="m" className={spacing({ mb: 's' })}>
+        <Stack
+            direction="row"
+            align="center"
+            gap="m"
+            className={spacing({ mb: 's' })}
+        >
           <Typography variant="heading-l">Файлы</Typography>
           <Stack direction="row" gap="s">
             {canManageFiles && (

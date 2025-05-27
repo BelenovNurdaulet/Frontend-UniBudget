@@ -146,8 +146,8 @@ const MyRequestsTable = () => {
                         </Stack>
                     </Stack>
 
-                    <TableContainer height="400px">
-                        <Table size="m" divider="row" stickyHeader striped fullWidth>
+                    <TableContainer height="500px">
+                        <Table size="m" divider="row" stickyHeader fullWidth>
                             <TableHead>
                                 <TableRow>
                                     <TableCell>Заголовок</TableCell>
@@ -189,36 +189,38 @@ const MyRequestsTable = () => {
                         </Table>
                     </TableContainer>
 
-                    <Stack
-                        direction="row"
-                        justify="end"
-                        align="center"
-                        gap="m"
-                        style={{ marginTop: 16, width: '100%' }}
-                    >
-                        <Select
-                            size="s"
-                            label="Кол-во записей"
-                            value={pageSize}
-                            onChange={(value) => {
-                                setPageSize(Number(value));
-                                setPage(0);
-                            }}
-                        >
-                            <Option value={10}>10</Option>
-                            <Option value={20}>20</Option>
-                            <Option value={50}>50</Option>
-                            <Option value={100}>100</Option>
-                        </Select>
-                        <Pagination
-                            page={page}
-                            pageSize={pageSize}
-                            totalCount={totalCount}
-                            onPageChange={setPage}
-                            size="s"
-                        />
-                    </Stack>
                 </Card>
+            </Stack>
+
+
+            <Stack
+                direction="row"
+                justify="end"
+                align="center"
+                gap="m"
+                style={{ marginTop: 16, width: '100%' }}
+            >
+                <Select
+                    size="s"
+                    label="Кол-во записей"
+                    value={pageSize}
+                    onChange={(value) => {
+                        setPageSize(Number(value));
+                        setPage(0);
+                    }}
+                >
+                    <Option value={10}>10</Option>
+                    <Option value={20}>20</Option>
+                    <Option value={50}>50</Option>
+                    <Option value={100}>100</Option>
+                </Select>
+                <Pagination
+                    page={page}
+                    pageSize={pageSize}
+                    totalCount={totalCount}
+                    onPageChange={setPage}
+                    size="s"
+                />
             </Stack>
         </div>
     );

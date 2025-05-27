@@ -1,13 +1,11 @@
 import {
-    DashboardIcon,
     UserCircleOutlineIcon,
     PowerOutlineIcon,
     RequestIcon,
-    Suitcase2Icon, CalendarIcon, PlasticCardAddIcon, BookIcon,
+    CalendarIcon, PlasticCardAddIcon, BookIcon,
 } from '@ozen-ui/icons';
 
 import AllRequestsTable from './features/request/AllRequestsTable.jsx';
-import MyIssuancesTable from './features/Issuance/MyIssuancesTable.jsx';
 import CreateRequest from './features/request/CreateRequest.jsx';
 import CreatePeriod from './features/period/CreatePeriod.jsx';
 import Periods from './features/period/Periods.jsx';
@@ -17,7 +15,8 @@ import PeriodInfo from "./features/period/periodInfo/PeriodInfo.jsx";
 import EditPeriod from "./features/period/EditPeriod.jsx";
 import RequestInfo from "./features/request/RequestInfo/RequestInfo.jsx";
 import MyRequestsTable from "./features/request/MyRequestsTable.jsx";
-
+import { ROLES, ALL_ROLES } from './utils/rolesConfig.jsx';
+import EditRequest from "./features/request/EditRequest.jsx";
 const routes = {
     'all-requests': {
         title: 'Все заявки',
@@ -25,6 +24,7 @@ const routes = {
         path: '/all-requests',
         icon: BookIcon ,
         component: () => <AllRequestsTable />,
+        roles: [ROLES.Administration, ROLES.Finance , ROLES.HeadOfDepartment],
     },
     'my-requests': {
         title: 'Мои заявки',
@@ -32,6 +32,7 @@ const routes = {
         path: '/my-requests',
         icon: BookIcon ,
         component: () => <MyRequestsTable />,
+        roles: ALL_ROLES,
     },
 
     'create-request': {
@@ -40,6 +41,7 @@ const routes = {
         path: '/create-request',
         icon: RequestIcon,
         component: () => <CreateRequest />,
+        roles: ALL_ROLES,
     },
     requestsInfo:{
         title: 'Информация о заявке',
@@ -47,6 +49,15 @@ const routes = {
         path: 'request/:id',
         icon: RequestIcon,
         component: () => <RequestInfo />,
+        roles: ALL_ROLES,
+    },
+    requestsEdit:{
+        title: 'Редактирование заявки',
+        link: 'edit-request/:id',
+        path: 'edit-request/:id',
+        icon: RequestIcon,
+        component: () => <EditRequest/>,
+        roles: ALL_ROLES,
     },
 
 
@@ -56,6 +67,7 @@ const routes = {
         path: '/users',
         icon: UserCircleOutlineIcon,
         component: () => <UsersList />,
+        roles: ALL_ROLES,
     },
     'create-period': {
         title: 'Создать период',
@@ -63,6 +75,7 @@ const routes = {
         path: '/create-period',
         icon: PlasticCardAddIcon ,
         component: () => <CreatePeriod />,
+        roles: [ROLES.Administration],
     },
     periods: {
         title: 'Периоды',
@@ -70,6 +83,7 @@ const routes = {
         path: '/periods',
         icon: CalendarIcon ,
         component: () => <Periods />,
+        roles: ALL_ROLES,
     },
     periodInfo: {
         title: 'Информация о периоде',
@@ -77,6 +91,7 @@ const routes = {
         path: '/periods/:id',
         icon: RequestIcon,
         component: () => <PeriodInfo />,
+        roles: ALL_ROLES,
     },
     periodEdit: {
         title: 'Редактировать период',
@@ -84,6 +99,7 @@ const routes = {
         path: '/periods/:id/edit',
         icon: RequestIcon,
         component: () => <EditPeriod />,
+        roles:[ROLES.Administration],
     },
     profile: {
         title: 'Профиль',
@@ -91,13 +107,15 @@ const routes = {
         path: '/manage',
         icon: UserCircleOutlineIcon,
         component: () => <UserProfile />,
+        roles: ALL_ROLES,
     },
     logout: {
         title: 'Завершить сеанс',
         link: '/logout',
         path: '/logout',
         icon: PowerOutlineIcon,
-        component: () => <div>Завершить сеанс</div>, // заглушка
+        component: () => <div>Завершить сеанс</div>,
+        roles: ALL_ROLES,
     },
 
 };

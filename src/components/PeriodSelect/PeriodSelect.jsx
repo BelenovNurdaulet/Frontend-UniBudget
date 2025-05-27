@@ -1,6 +1,6 @@
 import { useBoolean } from '@ozen-ui/kit/useBoolean';
 
-import { useEffect, useState } from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {Input} from "@ozen-ui/kit/Input";
 import {Dialog, DialogBody, DialogHeader, DialogTitle} from "@ozen-ui/kit/DialogNext";
 import {Loader} from "@ozen-ui/kit/Loader";
@@ -16,7 +16,7 @@ import {DatePicker} from "@ozen-ui/kit/DatePicker";
 import {Pagination} from "@ozen-ui/kit/Pagination";
 import {Select} from "@ozen-ui/kit/Select";
 import {Option} from "@ozen-ui/kit/Select";
-import {useNavigate} from "react-router";
+import { useNavigate } from "react-router-dom";
 import {useSelector} from "react-redux";
 import {selectUser} from "../../features/auth/authSlice.js";
 import {Button} from "@ozen-ui/kit/ButtonNext";
@@ -24,73 +24,46 @@ import {DownloadFileIcon, EditIcon} from "@ozen-ui/icons";
 import { saveAs } from 'file-saver';
 import getFormattedDate from "../../utils/getFormattedDate.js";
 import {Link as RouterLink} from "react-router-dom";
-import periods from "../../features/period/Periods.jsx";
-
-
 
 const PeriodSelect = ({ selectedPeriodId, setSelectedPeriodId }) => {
+    const user = useSelector(selectUser);
+    const navigate = useNavigate();
+    const [fetchExcel] = useLazyGetPeriodExcelQuery();
 
-
-    const user = useSelector(selectUser)
-    const navigate = useNavigate()
-    const [fetchExcel] = useLazyGetPeriodExcelQuery()
-
-    const roleClaim = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
-    const role = user?.[roleClaim]
-
-    const canShowCreateApplication = (period) => {
-        const now = new Date()
-        const start = new Date(period.submissionStartDate)
-        const end = new Date(period.submissionEndDate)
-        return now >= start && now <= end
-    }
-
-    const canShowReport = (period, role) => {
-        const isFinished = new Date(period.executionEndDate) < new Date()
-        return ['Administration', 'Finance'].includes(role) && isFinished
-    }
-
-    const handleDownload = async (id, name) => {
-        try {
-            const blob = await fetchExcel(id).unwrap()
-            const filename = `Period_${name}_${new Date().toISOString()}.xlsx`
-            saveAs(blob, filename)
-        } catch (e) {
-            console.error('Ошибка при скачивании Excel:', e)
-        }
-    }
-
+    const roleClaim = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
+    const role = user?.[roleClaim];
 
     const [open, { on: openModal, off: closeModal }] = useBoolean(false);
-
     const [selectedName, setSelectedName] = useState('');
-    const formatDateForQuery = (date) => {
-        if (!date) return undefined;
-        return new Date(date).toISOString().slice(0, 16);
-    };
-
-
-
 
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
 
+    const formatDateForQuery = useCallback((date) => {
+        return date ? new Date(date).toISOString().slice(0, 16) : undefined;
+    }, []);
 
-    const { data, isLoading } = useGetPeriodsQuery({
+    const { data, isLoading, refetch } = useGetPeriodsQuery({
         PageNumber: page + 1,
         PageSize: pageSize,
         IsActive: true,
         StartDate: formatDateForQuery(startDate),
         EndDate: formatDateForQuery(endDate),
-
+    }, {
+        skip: !open,
     });
-
 
     const { data: selectedPeriod } = useGetPeriodByIdQuery(selectedPeriodId, {
         skip: !selectedPeriodId,
     });
+
+    useEffect(() => {
+        if (open) {
+            refetch();
+        }
+    }, [open, refetch]);
 
     useEffect(() => {
         if (selectedPeriod?.name) {
@@ -103,67 +76,86 @@ const PeriodSelect = ({ selectedPeriodId, setSelectedPeriodId }) => {
         setSelectedPeriodId(id);
     };
 
+    const handleDownload = async (id, name) => {
+        try {
+            const blob = await fetchExcel(id).unwrap();
+            const filename = `Period_${name}_${new Date().toISOString()}.xlsx`;
+            saveAs(blob, filename);
+        } catch (e) {
+            console.error('Ошибка при скачивании Excel:', e);
+        }
+    };
+
+    const canShowCreateApplication = (period) => {
+        const now = new Date();
+        const start = new Date(period.submissionStartDate);
+        const end = new Date(period.submissionEndDate);
+        return now >= start && now <= end;
+    };
+
+    const canShowReport = (period, role) => {
+        const isFinished = new Date(period.executionEndDate) < new Date();
+        return ['Administration', 'Finance'].includes(role) && isFinished;
+    };
+
     const { items = [], totalCount = 0 } = data || {};
 
     return (
         <>
-            <Stack direction="row" align="center" gap="s" fullWidth>
-                <Input
-                    label="Выберите период"
-                    value={selectedName}
-                    onClick={openModal}
-                    readOnly
-                    fullWidth
-                />
+            <Stack direction="row" gap="m" align="end" fullWidth wrap>
+                <div style={{ flex: '4 1 0', minWidth: 180 }}>
+                    <Input
+                        label="Выберите период"
+                        value={selectedName}
+                        onClick={openModal}
+                        readOnly
+                        fullWidth
+                    />
+                </div>
 
-                {selectedPeriod && (
-                    <>
-                        {canShowCreateApplication(selectedPeriod) && (
-                            <Button
-                                color="primary"
-                                size="s"
-                                onClick={() => navigate(`/create-request?periodId=${selectedPeriod.id}`)}
-                                iconLeft={EditIcon}
-                                style={{width: '58%'}} >
-                                Создать заявку
-                            </Button>
-                        )}
+                {selectedPeriod && canShowCreateApplication(selectedPeriod) && (
+                    <Button
+                        color="primary"
+                        style={{ flex: '1 1 0', minWidth: 180 }}
+                        onClick={() => navigate(`/create-request?periodId=${selectedPeriod.id}`)}
+                        iconLeft={EditIcon}
+                        fullWidth
+                    >
+                        Создать заявку
+                    </Button>
+                )}
 
-                        {canShowReport(selectedPeriod, role) && (
-                            <Button
-                                color="primary"
-                                size="s"
-                                onClick={() => handleDownload(selectedPeriod.id, selectedPeriod.name)}
-                                iconLeft={DownloadFileIcon}
-                                style={{width: '58%'}} >
-
-                                Сформировать отчет
-                            </Button>
-                        )}
-                    </>
+                {selectedPeriod && canShowReport(selectedPeriod, role) && (
+                    <Button
+                        color="primary"
+                        style={{ flex: '1 1 0', minWidth: 180 }}
+                        onClick={() => handleDownload(selectedPeriod.id, selectedPeriod.name)}
+                        iconLeft={DownloadFileIcon}
+                        fullWidth
+                    >
+                        Сформировать отчет
+                    </Button>
                 )}
             </Stack>
 
-            <Dialog open={open} onClose={closeModal} size="xl" deviceType='desktop' >
+            <Dialog open={open} onClose={closeModal} size="xl" deviceType="desktop">
                 <DialogHeader>
-                    <DialogTitle >Выбор бюджетного периода</DialogTitle>
+                    <DialogTitle>Выбор бюджетного периода</DialogTitle>
                 </DialogHeader>
                 <DialogBody>
                     <Stack direction="column" gap="m" fullWidth>
-                        <Stack direction="row"  gap="m" wrap fullWidth>
+                        <Stack direction="row" gap="m" wrap fullWidth>
                             <DatePicker
                                 label="Дата начала"
                                 value={startDate}
                                 onChange={setStartDate}
-                                style={{ width: "49%" }}
-
+                                style={{ width: '49%' }}
                             />
                             <DatePicker
                                 label="Дата окончания"
                                 value={endDate}
                                 onChange={setEndDate}
-                                style={{ width: "49%" }}
-
+                                style={{ width: '49%' }}
                             />
                         </Stack>
 
@@ -180,7 +172,6 @@ const PeriodSelect = ({ selectedPeriodId, setSelectedPeriodId }) => {
                                                     <TableCell>Название</TableCell>
                                                     <TableCell>Создан</TableCell>
                                                     <TableCell align="center">Действия</TableCell>
-
                                                 </TableRow>
                                             </TableHead>
                                             <TableBody>
@@ -197,14 +188,13 @@ const PeriodSelect = ({ selectedPeriodId, setSelectedPeriodId }) => {
                                                         <TableCell align="center">
                                                             <RouterLink to={`/periods/${period.id}`}>Подробнее</RouterLink>
                                                         </TableCell>
-
-
                                                     </TableRow>
                                                 ))}
                                             </TableBody>
                                         </Table>
                                     </TableContainer>
-                                    <Stack direction="row" justify="end" align="center" gap="m"   style={{ marginTop: 16, width: '100%' }}>
+
+                                    <Stack direction="row" justify="end" align="center" gap="m" style={{ marginTop: 16, width: '100%' }}>
                                         <Select
                                             size="s"
                                             label="Кол-во записей"
@@ -224,10 +214,8 @@ const PeriodSelect = ({ selectedPeriodId, setSelectedPeriodId }) => {
                                             size="s"
                                         />
                                     </Stack>
-
                                 </Card>
-
-                                 </>
+                            </>
                         )}
                     </Stack>
                 </DialogBody>

@@ -1,41 +1,43 @@
-import {
-  ArrowDownFilledIcon,
-  ArrowUpFilledIcon,
-  DotIcon,
-} from '@ozen-ui/icons';
-import { Badge } from '@ozen-ui/kit/Badge';
-import { Collapse } from '@ozen-ui/kit/Collapse';
-import { ListItemButton, ListItemIcon, ListItemText } from '@ozen-ui/kit/List';
-import { Tooltip } from '@ozen-ui/kit/Tooltip';
+import { useSelector } from 'react-redux';
+import { Link, useLocation } from 'react-router-dom';
 import { useBoolean } from '@ozen-ui/kit/useBoolean';
 import { useBreakpoints } from '@ozen-ui/kit/useBreakpoints';
+import { Tooltip } from '@ozen-ui/kit/Tooltip';
+import { Collapse } from '@ozen-ui/kit/Collapse';
+import { ListItemButton, ListItemIcon, ListItemText } from '@ozen-ui/kit/List';
+import { ArrowDownFilledIcon, ArrowUpFilledIcon, DotIcon } from '@ozen-ui/icons';
 
-import { Link, useLocation } from 'react-router-dom';
-
-import { navigation } from '../../helpers';
-
-
+import { navigation } from '../../helpers.jsx';
+import { selectUser } from '../../features/auth/authSlice.js';
+import { ROLES } from '../../utils/rolesConfig.jsx';
 import { isSelectedItem } from './utils';
-import {AccentList} from "../AccentList/AccentList.jsx";
-import {useAppBar} from "../AppBar/useAppBar.js";
+import { AccentList } from "../AccentList/AccentList.jsx";
+import { useAppBar } from "../AppBar/useAppBar.js";
+import {Badge} from "@ozen-ui/kit/Badge";
 
-const NavigationItem = ({ onClick, name }) => {
+
+const roleClaim = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
+
+const NavigationItem = ({ onClick,name, userRole }) => {
   const { m } = useBreakpoints();
   const isMobile = !m;
-
-  const [[, { off: close }], [expand]] = useAppBar();
-  const [expandedList, { toggle }] = useBoolean(false);
-
+  const [appBarState, appBarActions] = useAppBar();
+  const { expand } = appBarState;
+  const { off: close } = appBarActions;
+  const [expanded, { toggle }] = useBoolean(false);
   const location = useLocation();
 
-  const root = navigation.routes[Array.isArray(name) ? name[0] : name];
-  const { icon: Icon, link, title, count } = root;
+  const cfg = navigation.routes[name];
+  if (cfg.roles && !cfg.roles.includes(userRole)) return null;
 
-  const subItems = Array.isArray(name) ? name.slice(1) : undefined;
-  const hasSubItems = subItems && subItems.length;
+  const Icon = cfg.icon;
+  const title = cfg.title;
+  const link = cfg.link;
+  const subItems = cfg.subItems || [];
+  const hasSub = subItems.length > 0;
 
   const handleClick = () => {
-    if (hasSubItems) {
+    if (hasSub) {
       toggle();
     } else {
       if (close) close();
@@ -58,62 +60,41 @@ const NavigationItem = ({ onClick, name }) => {
           >
             {Icon && (
                 <ListItemIcon>
-                  {!expand && count && !isMobile ? (
-                      <Badge content={count} variant="dot" color="errorDark">
-                        <Icon />
-                      </Badge>
-                  ) : (
-                      <Icon />
-                  )}
+                  <Icon />
                 </ListItemIcon>
             )}
-            <ListItemText
-                primary={title}
-                primaryTypographyProps={{ noWrap: true, color: 'accentPrimary' }}
+            <ListItemText primary={title}
+                          primaryTypographyProps={{ noWrap: true, color: 'accentPrimary' }}
             />
-            {count && (
+            {cfg.count && (
                 <ListItemIcon>
-                  <Badge content={count} color="errorDark" />
+                  <Badge content={cfg.count} color="errorDark" />
                 </ListItemIcon>
             )}
-            {hasSubItems && (
+            {hasSub && (
                 <ListItemIcon>
-                  {expandedList ? <ArrowUpFilledIcon /> : <ArrowDownFilledIcon />}
+                  {expanded ? <ArrowUpFilledIcon /> : <ArrowDownFilledIcon />}
                 </ListItemIcon>
             )}
           </ListItemButton>
         </Tooltip>
-        {hasSubItems && (
-            <Collapse expanded={expandedList} unmountOnClosed>
+
+        {hasSub && (
+            <Collapse expanded={expanded} unmountOnClosed>
               <AccentList>
-                {subItems.map((subName, index) => {
-                  const { title, link } = navigation.routes[subName];
+                {subItems.map(sub => {
+                  const subCfg = navigation.routes[sub];
+                  if (subCfg.roles && !subCfg.roles.includes(userRole)) return null;
                   return (
-                      <Tooltip
-                          label={title}
-                          offset={[0, 20]}
-                          placement="right"
-                          key={index}
-                          disabled={expand || isMobile}
+                      <ListItemButton
+                          as={Link}
+                          to={link || ''}
+                          onClick={close}
+                          selected={isSelectedItem(link, location.pathname)}
                       >
-                        <ListItemButton
-                            as={Link}
-                            to={link || ''}
-                            onClick={close}
-                            selected={isSelectedItem(link, location.pathname)}
-                        >
-                          <ListItemIcon>
-                            {!expand && !isMobile && <DotIcon />}
-                          </ListItemIcon>
-                          <ListItemText
-                              primary={title}
-                              primaryTypographyProps={{
-                                noWrap: true,
-                                color: 'accentPrimary',
-                              }}
-                          />
-                        </ListItemButton>
-                      </Tooltip>
+                        <ListItemIcon><DotIcon /></ListItemIcon>
+                        <ListItemText primary={subCfg.title} primaryTypographyProps={{ noWrap: true }} />
+                      </ListItemButton>
                   );
                 })}
               </AccentList>
@@ -124,10 +105,14 @@ const NavigationItem = ({ onClick, name }) => {
 };
 
 export const Navigation = () => {
+  const user = useSelector(selectUser);
+  const rawRole = user?.[roleClaim];
+  const userRole = rawRole || ROLES.RequestCreator;
   return (
+
       <AccentList as="nav">
-        {navigation.apps.map((app, index) => (
-            <NavigationItem name={app} key={index} />
+        {navigation.apps.map(app => (
+            <NavigationItem key={app} name={app} userRole={userRole} />
         ))}
       </AccentList>
   );

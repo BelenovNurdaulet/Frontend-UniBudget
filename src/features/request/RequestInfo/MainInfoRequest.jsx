@@ -7,7 +7,6 @@ import {BRANCHES} from "../../../utils/branches.js";
 
 const MainInfoRequest = ({ request }) => {
     const {
-        title,
         description,
         requestCategoryId,
         requestSubCategoryId,

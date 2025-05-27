@@ -1,5 +1,5 @@
 
-import { ROLES } from '../roles'
+import { ROLES } from '../rolesConfig.jsx'
 
 export const getStatusColor = (status) => {
   switch (status) {
