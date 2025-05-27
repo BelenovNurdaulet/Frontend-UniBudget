@@ -70,14 +70,14 @@ const RequestInfo = () => {
         files = [],
         period,
         creatorName,
-        headOfDepartmentName,
+        headOfBranchName,
     } = data;
 
     const statusName = REQUEST_STATUSES_CONFIG[requestStatus]?.name || 'Неизвестно';
 
     const isCreator = userName === creatorName;
     const isHead =
-        userRole === ROLES.HeadOfDepartment || userName === headOfDepartmentName;
+        userRole === ROLES.HeadOfBranch || userName === headOfBranchName;
 
     const now = new Date();
     const isInSubmissionPeriod =

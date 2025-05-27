@@ -15,8 +15,19 @@ import getFormattedDate from '../../utils/getFormattedDate';
 import { useGetUsersQuery } from '../UserProfle/userApi.js';
 import styles from '../period/Periods.module.css';
 import {Link} from "react-router-dom";
+import { useSelector } from 'react-redux';
+import { selectBranches } from '../reference/referenceSlice';
+import {ROLE_LABELS} from "../../utils/rolesConfig.jsx";
 
 const UsersList = () => {
+    const branches = useSelector(selectBranches);
+    const branchesMap = useMemo(() => {
+        return branches.reduce((acc, branch) => {
+            acc[branch.id] = branch.name;
+            return acc;
+        }, {});
+    }, [branches]);
+
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
@@ -110,6 +121,7 @@ const UsersList = () => {
                                         <SortableHeader field="userName" label="Имя пользователя" />
                                         <SortableHeader field="email" label="Email" />
                                         <SortableHeader field="role" label="Роль" />
+                                        <SortableHeader field="branchId" label="Филиал" />
                                         <SortableHeader field="createdAt" label="Дата создания" />
                                         <TableCell align="center"></TableCell>
                                     </TableRow>
@@ -129,7 +141,9 @@ const UsersList = () => {
                                                 </TableCell>
                                                 <TableCell>{user.userName}</TableCell>
                                                 <TableCell>{user.email}</TableCell>
-                                                <TableCell>{user.role}</TableCell>
+                                                <TableCell>{ROLE_LABELS[user.role] || user.role}</TableCell>
+
+                                                <TableCell>{branchesMap[user.branchId] || '—'}</TableCell>
                                                 <TableCell align="center">{getFormattedDate(user.createdAt)}</TableCell>
                                                 <TableCell align="center">
                                                     <Link  onClick={() => {}}>

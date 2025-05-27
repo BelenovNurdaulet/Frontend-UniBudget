@@ -1,7 +1,7 @@
 export const ROLES = {
     Administration:0,
     RequestCreator: 1,
-    HeadOfDepartment: 2,
+    HeadOfBranch: 2,
     Finance: 3,
 }
 

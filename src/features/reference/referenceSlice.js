@@ -4,7 +4,7 @@ import { referenceApi } from './referenceApi'
 const staticRoles = [
     { id: 0, name: 'Administration' },
     { id: 1, name: 'RequestCreator' },
-    { id: 2, name: 'HeadOfDepartment' },
+    { id: 2, name: 'HeadOfBranch' },
     { id: 3, name: 'Finance' },
 ]
 

@@ -55,7 +55,7 @@ export const requestApi = apiSlice.injectEndpoints({
 
         manageRequest: builder.mutation({
             query: ({ requestId, action, comment }) => ({
-                url: '/api/request/HeadOfDepartment',
+                url: '/api/request/HeadOfBranch',
                 method: 'PATCH',
                 body: { requestId, action, comment },
             }),
@@ -113,11 +113,11 @@ export const requestApi = apiSlice.injectEndpoints({
         actOnRequest: builder.mutation({
             query: ({ requestId, action, comment, requestStatus }) => {
                 const endpointMap = {
-                    InReview: 'HeadOfDepartment',
+                    InReview: 'HeadOfBranch',
                     Approved: 'Finance',
                 };
 
-                const target = endpointMap[requestStatus] || 'HeadOfDepartment';
+                const target = endpointMap[requestStatus] || 'HeadOfBranch';
 
                 return {
                     url: `/api/request/${target}`,

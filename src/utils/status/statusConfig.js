@@ -39,7 +39,7 @@ export const REQUEST_STATUSES_CONFIG = {
   },
   InReview: {
     name: 'На соглосовании руководителем',
-    responsibleRole: ROLES.HeadOfDepartment,
+    responsibleRole: ROLES.HeadOfBranch,
     actions: [
       { actionName: 'approve', label: 'Принять в работу',    requireComment: false },
       { actionName: 'return', label: 'Вернуть на доработку', requireComment: true  },

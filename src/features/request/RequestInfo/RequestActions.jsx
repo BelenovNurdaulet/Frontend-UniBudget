@@ -58,7 +58,7 @@ const RequestActions = ({ request, onStatusChanged }) => {
         requestStatus,
         periodId,
         creatorName,
-        headOfDepartmentName,
+        headOfBranchName,
     } = request;
 
     const { data: period } = useGetPeriodByIdQuery(periodId);
@@ -83,7 +83,7 @@ const RequestActions = ({ request, onStatusChanged }) => {
         now <= new Date(period.approvalEndDate)
     );
     const canHeadActInPeriod =
-        userRole === ROLES.HeadOfDepartment &&
+        userRole === ROLES.HeadOfBranch &&
         (requestStatus === 'InReview' || requestStatus === 'ReturnToReviewer') &&
         isInApprovalPeriod;
 
@@ -94,8 +94,8 @@ const RequestActions = ({ request, onStatusChanged }) => {
 
     const isCreator = userName === creatorName;
     const isHead =
-        userRole === ROLES.HeadOfDepartment ||
-        userName === headOfDepartmentName;
+        userRole === ROLES.HeadOfBranch ||
+        userName === headOfBranchName;
 
     const canEdit =
         (isInSubmissionPeriod && isCreator) ||
