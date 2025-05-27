@@ -2,10 +2,13 @@ import { Card } from '@ozen-ui/kit/Card'
 import { Typography } from '@ozen-ui/kit/Typography'
 import { spacing } from '@ozen-ui/kit/MixSpacing'
 import { Table, TableBody, TableCell, TableContainer, TableRow } from '@ozen-ui/kit/Table'
-import {REQUEST_CATEGORIES} from "../../../utils/categories.js";
-import {BRANCHES} from "../../../utils/branches.js";
+import {useGetReferenceQuery} from "../../reference/referenceApi.js";
+import {selectBranches, selectCategories} from "../../reference/referenceSlice.js";
+import {useSelector} from "react-redux";
+
 
 const MainInfoRequest = ({ request }) => {
+
     const {
         description,
         requestCategoryId,
@@ -18,7 +21,15 @@ const MainInfoRequest = ({ request }) => {
         comment,
 
     } = request
-
+    useGetReferenceQuery(); // для инициализации reference данных
+    const branches = useSelector(selectBranches);
+    const categories = useSelector(selectCategories);
+    const branchName = branches.find(b => b.id === branchId)?.name || '—';
+    const categoryName = categories.find(c => c.id === requestCategoryId)?.name || '—';
+    const subCategoryName =
+        categories
+            .find(c => c.id === requestCategoryId)
+            ?.subCategories?.find(sc => sc.id === requestSubCategoryId)?.name || '—';
     return (
         <>
             <Typography
@@ -41,14 +52,14 @@ const MainInfoRequest = ({ request }) => {
                             <TableRow>
                                 <TableCell align="left">Категория заявки:</TableCell>
                                 <TableCell align="right">
-                                    {REQUEST_CATEGORIES[requestCategoryId]?.name || '—'}
+                                    {categoryName}
                                 </TableCell>
                             </TableRow>
 
                             <TableRow>
                                 <TableCell align="left">Подкатегория заявки:</TableCell>
                                 <TableCell align="right">
-                                    {REQUEST_CATEGORIES[requestCategoryId]?.subCategories?.[requestSubCategoryId] || '—'}
+                                    {subCategoryName}
                                 </TableCell>
                             </TableRow>
 
@@ -58,7 +69,7 @@ const MainInfoRequest = ({ request }) => {
                             </TableRow>
                             <TableRow>
                                 <TableCell align="left">Филиал:</TableCell>
-                                <TableCell align="right">{BRANCHES[branchId] || '—'}</TableCell>
+                                <TableCell align="right">{branchName}</TableCell>
                             </TableRow>
 
                             <TableRow>

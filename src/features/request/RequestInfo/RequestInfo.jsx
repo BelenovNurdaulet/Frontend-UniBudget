@@ -101,19 +101,19 @@ const RequestInfo = () => {
                         <RequestActions request={data} onStatusChanged={refetch} />
                     </GridItem>
                 </Grid>
-                <Grid cols={1} justify="end">
-                    <GridItem row={1}>
-                        <Tag
-                            as="div"
-                            size="m"
-                            color={getStatusColor(requestStatus)}
-                            label={statusName}
-                            style={{ width: 'fit-content' }}
-                        />
-                    </GridItem>
-                </Grid>
+
             </Grid>
 
+            <Typography variant="text-m">Статус заявки</Typography>
+
+            <Tag
+                as="div"
+                size="m"
+                variant="secondary"
+                color={getStatusColor(requestStatus)}
+                label={statusName}
+                style={{ width: 'fit-content' }}
+            />
             <MainInfoRequest request={data} />
 
             <RequestFiles

@@ -19,8 +19,6 @@ export const getStatusColor = (status) => {
   }
 }
 
-
-
 export const REQUEST_STATUSES_CONFIG = {
   Created: {
     name: 'Заявка создана',
@@ -28,7 +26,6 @@ export const REQUEST_STATUSES_CONFIG = {
     actions: [
 
     ],
-
 
   },
   ReturnToCreator: {
@@ -69,12 +66,12 @@ export const REQUEST_STATUSES_CONFIG = {
   },
   Submitted: {
     name: 'Соглосована',
-    responsibleRole: null,    // финализированная — дальше ничего нельзя
+    responsibleRole: null,
     actions: [],
   },
   Cancelled: {
     name: 'Отменена',
-    responsibleRole: null,    // отмена — концевой статус
+    responsibleRole: null,
     actions: [],
   },
 }

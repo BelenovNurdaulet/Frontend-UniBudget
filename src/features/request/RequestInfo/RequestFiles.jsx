@@ -160,7 +160,7 @@ const RequestFiles = ({
                     <TableRow>
                       <TableCell align="left">№</TableCell>
                       <TableCell align="left">Название</TableCell>
-                      {canDeleteFiles && <TableCell align="center">Действия</TableCell>}
+                      {canDeleteFiles && <TableCell align="center"></TableCell>}
                     </TableRow>
                   </TableHead>
                   <TableBody>

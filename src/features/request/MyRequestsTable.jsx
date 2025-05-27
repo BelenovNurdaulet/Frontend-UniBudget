@@ -258,7 +258,7 @@ const MyRequestsTable = () => {
                                     <SortableHeader field="amount" label="Сумма" />
                                     <SortableHeader field="requestStatus" label="Статус" />
                                     <SortableHeader field="createdAt" label="Дата создания" />
-                                    <TableCell align="center">Действия</TableCell>
+                                    <TableCell align="center"></TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -271,16 +271,16 @@ const MyRequestsTable = () => {
                                 ) : (
                                     paginatedRequests.map((item) => (
                                         <TableRow key={item.id}>
-                                            <TableCell>{item.title}</TableCell>
-                                            <TableCell>{item.amount} ₸</TableCell>
-                                            <TableCell>
+                                            <TableCell  align="left">{item.title}</TableCell>
+                                            <TableCell  align="center">{item.amount} ₸</TableCell>
+                                            <TableCell  align="left">
                                                 <Tag
                                                     color={getStatusColor(item.requestStatus)}
                                                     size="s"
                                                     label={REQUEST_STATUSES_CONFIG[item.requestStatus]?.name || item.requestStatus}
                                                 />
-                                            </TableCell>
-                                            <TableCell>{getFormattedDate(item.createdAt)}</TableCell>
+                                            </TableCell  >
+                                            <TableCell  align="center">{getFormattedDate(item.createdAt)}</TableCell>
                                             <TableCell align="center">
                                                 <RouterLink to={`/request/${item.id}`}>Подробнее</RouterLink>
                                             </TableCell>

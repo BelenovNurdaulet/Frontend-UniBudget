@@ -25,6 +25,14 @@ export const userApi = apiSlice.injectEndpoints({
             }),
             keepUnusedDataFor: 0,
         }),
+        getUsers: builder.query({
+            query: ({ pageNumber = 1, pageSize = 10 }) => ({
+                url: `api/user`,
+                method: 'GET',
+                params: { PageNumber: pageNumber, PageSize: pageSize },
+            }),
+            keepUnusedDataFor: 0,
+        }),
     }),
 });
 
@@ -32,6 +40,7 @@ export const {
     useGetCurrentUserQuery,
     useUpdateUserMutation,
     useDeleteUserMutation,
+    useGetUsersQuery,
 } = userApi;
 
 export const {

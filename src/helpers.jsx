@@ -10,7 +10,7 @@ import CreateRequest from './features/request/CreateRequest.jsx';
 import CreatePeriod from './features/period/CreatePeriod.jsx';
 import Periods from './features/period/Periods.jsx';
 import UserProfile from './features/UserProfle/UserProfile.jsx';
-import UsersList from './features/Users/UsersList.jsx';
+import UsersList from './features/user/UsersList.jsx';
 import PeriodInfo from "./features/period/periodInfo/PeriodInfo.jsx";
 import EditPeriod from "./features/period/EditPeriod.jsx";
 import RequestInfo from "./features/request/RequestInfo/RequestInfo.jsx";
@@ -24,7 +24,7 @@ const routes = {
         path: '/all-requests',
         icon: BookIcon ,
         component: () => <AllRequestsTable />,
-        roles: [ROLES.Administration, ROLES.Finance , ROLES.HeadOfDepartment],
+        roles: [ROLES.Administration, ROLES.Finance ],
     },
     'my-requests': {
         title: 'Мои заявки',
@@ -67,7 +67,7 @@ const routes = {
         path: '/users',
         icon: UserCircleOutlineIcon,
         component: () => <UsersList />,
-        roles: ALL_ROLES,
+        roles: [ROLES.Administration, ROLES.Finance ],
     },
     'create-period': {
         title: 'Создать период',
@@ -128,6 +128,7 @@ export const navigation = {
         'create-request',
         'create-period',
         'periods',
+        'user-list',
         'logout',
     ],
 };

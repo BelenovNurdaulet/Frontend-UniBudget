@@ -185,7 +185,7 @@ const Periods = () => {
                                 <SortableHeader field="createdAt" label="Создан" />
                                 <SortableHeader field="updatedAt" label="Обновлён" />
                                 <SortableHeader field="createdBy" label="Активен" />
-                                <TableCell align="center">Действия</TableCell>
+                                <TableCell align="center"></TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>

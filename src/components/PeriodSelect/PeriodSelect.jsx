@@ -171,7 +171,7 @@ const PeriodSelect = ({ selectedPeriodId, setSelectedPeriodId }) => {
                                                     <TableCell>ID</TableCell>
                                                     <TableCell>Название</TableCell>
                                                     <TableCell>Создан</TableCell>
-                                                    <TableCell align="center">Действия</TableCell>
+                                                    <TableCell align="center"></TableCell>
                                                 </TableRow>
                                             </TableHead>
                                             <TableBody>

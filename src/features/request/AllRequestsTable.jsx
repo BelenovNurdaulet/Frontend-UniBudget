@@ -297,7 +297,7 @@ const AllRequestsTable = () => {
                                     <SortableHeader field="branchId" label="Подразделение" />
                                     <SortableHeader field="requestStatus" label="Статус" />
                                     <SortableHeader field="createdAt" label="Дата создания" />
-                                    <TableCell align="center">Действия</TableCell>
+                                    <TableCell align="center"></TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -310,18 +310,26 @@ const AllRequestsTable = () => {
                                 ) : (
                                     sortedRequests.map((item) => (
                                         <TableRow key={item.id}>
-                                            <TableCell>{item.title}</TableCell>
-                                            <TableCell>{item.amount} ₸</TableCell>
-                                            <TableCell>{branchesMap[item.branchId] || '—'}</TableCell>
-                                            <TableCell>
+                                            <TableCell align="left" className={styles.singleLineCell}>
+                                                {item.title}
+                                            </TableCell>
+                                            <TableCell align="center" className={styles.singleLineCell}>
+                                                {item.amount} ₸
+                                            </TableCell>
+                                            <TableCell align="center" className={styles.singleLineCell}>
+                                                {branchesMap[item.branchId] || '—'}
+                                            </TableCell>
+                                            <TableCell align="left" className={styles.singleLineCell}>
                                                 <Tag
                                                     color={getStatusColor(item.requestStatus)}
                                                     size="s"
                                                     label={REQUEST_STATUSES_CONFIG[item.requestStatus]?.name || item.requestStatus}
                                                 />
                                             </TableCell>
-                                            <TableCell>{getFormattedDate(item.createdAt)}</TableCell>
-                                            <TableCell align="center">
+                                            <TableCell align="center" className={styles.singleLineCell}>
+                                                {getFormattedDate(item.createdAt)}
+                                            </TableCell>
+                                            <TableCell align="center" className={styles.singleLineCell}>
                                                 <RouterLink to={`/request/${item.id}`}>Подробнее</RouterLink>
                                             </TableCell>
                                         </TableRow>
