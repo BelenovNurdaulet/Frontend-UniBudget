@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from 'react';
 import { Input } from '@ozen-ui/kit/Input';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@ozen-ui/kit/Table';
@@ -8,16 +7,17 @@ import { Stack } from '@ozen-ui/kit/Stack';
 import { spacing } from '@ozen-ui/kit/MixSpacing';
 import { Pagination } from '@ozen-ui/kit/Pagination';
 import { Select, Option } from '@ozen-ui/kit/Select';
-import {SearchIcon, SortDownIcon, SortUpIcon} from '@ozen-ui/icons';
+import { SearchIcon, SortDownIcon, SortUpIcon } from '@ozen-ui/icons';
 import { Loader } from '@ozen-ui/kit/Loader';
 import { Avatar } from '@ozen-ui/kit/Avatar';
-import getFormattedDate from '../../utils/getFormattedDate';
+
 import { useGetUsersQuery } from '../UserProfle/userApi.js';
-import styles from '../period/Periods.module.css';
-import {Link} from "react-router-dom";
+import styles from './UsersList.module.css';
+import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectBranches } from '../reference/referenceSlice';
-import {ROLE_LABELS} from "../../utils/rolesConfig.jsx";
+import { ROLE_LABELS } from "../../utils/rolesConfig.jsx";
+import EditUserDialog from './EditUserDialog';
 
 const UsersList = () => {
     const branches = useSelector(selectBranches);
@@ -33,8 +33,10 @@ const UsersList = () => {
     const [pageSize, setPageSize] = useState(10);
     const [sortField, setSortField] = useState(null);
     const [sortOrder, setSortOrder] = useState('asc');
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-    const { data, isLoading, isError } = useGetUsersQuery({
+    const { data, isLoading, isError, refetch } = useGetUsersQuery({
         pageNumber: page + 1,
         pageSize
     });
@@ -73,13 +75,18 @@ const UsersList = () => {
         }
     };
 
+    const openDialog = (user) => {
+        setSelectedUser(user);
+        setIsDialogOpen(true);
+    };
+
     const SortableHeader = ({ field, label }) => (
         <TableCell onClick={() => handleSort(field)} style={{ cursor: 'pointer' }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                {label}
-                {sortField === field &&
-                    (sortOrder === 'asc' ? <SortDownIcon size="s" /> : <SortUpIcon size="s" />)}
-            </span>
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+        {label}
+          {sortField === field &&
+              (sortOrder === 'asc' ? <SortDownIcon size="s" /> : <SortUpIcon size="s" />)}
+      </span>
         </TableCell>
     );
 
@@ -117,12 +124,12 @@ const UsersList = () => {
                             <Table size="m" divider="row" stickyHeader fullWidth>
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell>Аватар</TableCell>
+                                        <TableCell></TableCell>
                                         <SortableHeader field="userName" label="Имя пользователя" />
                                         <SortableHeader field="email" label="Email" />
                                         <SortableHeader field="role" label="Роль" />
                                         <SortableHeader field="branchId" label="Филиал" />
-                                        <SortableHeader field="createdAt" label="Дата создания" />
+
                                         <TableCell align="center"></TableCell>
                                     </TableRow>
                                 </TableHead>
@@ -139,16 +146,12 @@ const UsersList = () => {
                                                 <TableCell>
                                                     <Avatar size="xs" name={user.userName} />
                                                 </TableCell>
-                                                <TableCell>{user.userName}</TableCell>
-                                                <TableCell>{user.email}</TableCell>
-                                                <TableCell>{ROLE_LABELS[user.role] || user.role}</TableCell>
-
-                                                <TableCell>{branchesMap[user.branchId] || '—'}</TableCell>
-                                                <TableCell align="center">{getFormattedDate(user.createdAt)}</TableCell>
-                                                <TableCell align="center">
-                                                    <Link  onClick={() => {}}>
-                                                        Редактировать
-                                                    </Link>
+                                                <TableCell  className={styles.singleLineCell}>{user.userName}</TableCell>
+                                                <TableCell className={styles.singleLineCell}>{user.email}</TableCell>
+                                                <TableCell className={styles.singleLineCell}>{ROLE_LABELS[user.role] || user.role}</TableCell>
+                                                <TableCell className={styles.singleLineCell}>{branchesMap[user.branchId] || '—'}</TableCell>
+                                                  <TableCell className={styles.singleLineCell} align="center">
+                                                    <Link onClick={() => openDialog(user)}>Редактировать</Link>
                                                 </TableCell>
                                             </TableRow>
                                         ))
@@ -183,6 +186,13 @@ const UsersList = () => {
                     size="s"
                 />
             </Stack>
+
+            <EditUserDialog
+                user={selectedUser}
+                isOpen={isDialogOpen}
+                onClose={() => setIsDialogOpen(false)}
+                onSuccess={refetch}
+            />
         </div>
     );
 };

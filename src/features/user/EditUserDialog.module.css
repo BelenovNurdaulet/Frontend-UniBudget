@@ -1,0 +1,26 @@
+.dialogContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 0;
+}
+
+/* Контейнер для двух Select-ов в одну строку, с адаптацией */
+.selectRow {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* Обеспечивает равную ширину селектов */
+.selectRow > * {
+  flex: 1 1 200px;
+  min-width: 200px;
+}
+
+/* Стиль для корректной отрисовки caption под инпутами */
+.errorText {
+  margin-top: -12px;
+  margin-bottom: 4px;
+}

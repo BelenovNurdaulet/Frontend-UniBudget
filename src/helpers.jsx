@@ -9,7 +9,7 @@ import AllRequestsTable from './features/request/AllRequestsTable.jsx';
 import CreateRequest from './features/request/CreateRequest.jsx';
 import CreatePeriod from './features/period/CreatePeriod.jsx';
 import Periods from './features/period/Periods.jsx';
-import UserProfile from './features/UserProfle/UserProfile.jsx';
+
 import UsersList from './features/user/UsersList.jsx';
 import PeriodInfo from "./features/period/periodInfo/PeriodInfo.jsx";
 import EditPeriod from "./features/period/EditPeriod.jsx";
@@ -17,6 +17,7 @@ import RequestInfo from "./features/request/RequestInfo/RequestInfo.jsx";
 import MyRequestsTable from "./features/request/MyRequestsTable.jsx";
 import { ROLES, ALL_ROLES } from './utils/rolesConfig.jsx';
 import EditRequest from "./features/request/EditRequest.jsx";
+import UserProfile from "./features/user/UserProfile.jsx";
 const routes = {
     'all-requests': {
         title: 'Все заявки',
@@ -103,8 +104,8 @@ const routes = {
     },
     profile: {
         title: 'Профиль',
-        link: '/manage',
-        path: '/manage',
+        link: '/profile',
+        path: '/profile',
         icon: UserCircleOutlineIcon,
         component: () => <UserProfile />,
         roles: ALL_ROLES,
@@ -130,5 +131,6 @@ export const navigation = {
         'periods',
         'user-list',
         'logout',
+        'profile',
     ],
 };

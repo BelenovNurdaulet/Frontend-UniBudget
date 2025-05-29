@@ -18,13 +18,14 @@ export const userApi = apiSlice.injectEndpoints({
             keepUnusedDataFor: 0,
         }),
         deleteUser: builder.mutation({
-            query: (data) => ({
-                url: 'api/user/',
+            query: ({ id }) => ({
+                url: `api/user/${id}`,
                 method: 'DELETE',
-                body: data,
             }),
             keepUnusedDataFor: 0,
         }),
+
+
         getUsers: builder.query({
             query: ({ pageNumber = 1, pageSize = 10 }) => ({
                 url: `api/user`,
