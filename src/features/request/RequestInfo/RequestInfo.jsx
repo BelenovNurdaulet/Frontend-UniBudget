@@ -71,6 +71,7 @@ const RequestInfo = () => {
         period,
         creatorName,
         headOfBranchName,
+
     } = data;
 
     const statusName = REQUEST_STATUSES_CONFIG[requestStatus]?.name || 'Неизвестно';

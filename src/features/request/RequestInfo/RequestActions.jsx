@@ -48,7 +48,7 @@ const RequestActions = ({ request, onStatusChanged }) => {
 
     const roleClaim = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
     const nameClaim = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name';
-
+console.log(request.requestHistories)
     const roleName = user?.[roleClaim];
     const userRole = ROLES[roleName];
     const userName = user?.[nameClaim];
@@ -99,17 +99,17 @@ const RequestActions = ({ request, onStatusChanged }) => {
 
     const canEdit =
         (isInSubmissionPeriod && isCreator) ||
-        (requestStatus === 'ReturnToCreator' && isCreator) ||
-        (requestStatus === 'ReturnToReviewer' && isHead);
+        (requestStatus === 'ReturnToCreator' && isCreator)
 
 
     const statusConfig = REQUEST_STATUSES_CONFIG[requestStatus];
     const actions = statusConfig?.actions || [];
-    //   const responsibleRole = statusConfig?.responsibleRole;
+     //  const responsibleRole = statusConfig?.responsibleRole;
 
     const canUserAct =
         (userRole === ROLES.Administration ||
             canHeadActInPeriod ||
+            (requestStatus === 'ReturnToReviewer' && isHead) ||
             canFinanceActInPeriod) &&
         actions.length > 0;
 

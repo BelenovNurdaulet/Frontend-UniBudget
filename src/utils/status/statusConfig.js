@@ -57,7 +57,7 @@ export const REQUEST_STATUSES_CONFIG = {
   },
   ReturnToReviewer: {
     name: 'Возвращена на доработку руководителю',
-    responsibleRole: ROLES.HeadOfDepartment,
+    responsibleRole: ROLES.HeadOfBranch,
     actions: [
       { actionName: 'approve', label: 'Принять в работу',    requireComment: false },
       { actionName: 'return', label: 'Вернуть автору',       requireComment: true  },

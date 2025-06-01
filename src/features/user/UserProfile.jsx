@@ -14,6 +14,7 @@ import {useSelector} from "react-redux";
 import {selectBranches} from "../reference/referenceSlice.js";
 import {Card} from "@ozen-ui/kit/Card";
 import {Grid, GridItem} from "@ozen-ui/kit/Grid";
+import {ROLE_LABELS} from "../../utils/rolesConfig.jsx";
 
 
 
@@ -111,7 +112,7 @@ const UserProfile = () => {
                                 <Typography variant="text-s" color="tertiary" м>
                                     Почта
                                 </Typography>
-                                <Typography variant="text-m_1">{formData.email || '—'}</Typography>
+                                <Typography variant="text-m_1">{user.email || '—'}</Typography>
                             </GridItem>
 
                             <GridItem as={Card} borderWidth="s">
@@ -127,7 +128,7 @@ const UserProfile = () => {
                                 <Typography variant="text-s" color="tertiary" м>
                                     Роль
                                 </Typography>
-                                <Typography variant="text-m_1">{user.role}</Typography>
+                                <Typography variant="text-m_1">{ROLE_LABELS[user.role] || user.role}</Typography>
                             </GridItem>
                         </Grid>
                     </Stack>

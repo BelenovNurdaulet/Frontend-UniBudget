@@ -68,13 +68,13 @@ const CreatePeriod = () => {
                 control={control}
                 rules={{required: true}}
                 render={({field}) =>
-                    <DatePicker required {...field} fullWidth/>}
+                    <DatePicker size="s" required {...field} fullWidth/>}
             />
             <Controller
                 name={timeName}
                 control={control}
                 render={({field}) =>
-                    <Input type="time" required {...field} fullWidth/>}
+                    <Input size="s" type="time" required {...field} fullWidth/>}
             />
         </Stack>
 
@@ -96,7 +96,7 @@ const CreatePeriod = () => {
                             control={control}
                             rules={{required: true}}
                             render={({field}) => (
-                                <Input label="Название периода" fullWidth required {...field} />
+                                <Input size="s" label="Название периода" fullWidth required {...field} />
                             )}
                         />
                     </GridItem>

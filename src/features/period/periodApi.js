@@ -65,7 +65,7 @@ export const periodApi = apiSlice.injectEndpoints({
                 if (PeriodId !== undefined) searchParams.set('PeriodId', PeriodId);
                 if (TargetPeriodId !== undefined) searchParams.set('TargetPeriodId', TargetPeriodId);
 
-                return `/api/period/statisitcs?${searchParams.toString()}`;
+                return `/api/period/statistics?${searchParams.toString()}`;
             },
             keepUnusedDataFor: 0,
         }),

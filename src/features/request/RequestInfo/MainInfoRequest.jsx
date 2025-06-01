@@ -16,7 +16,7 @@ const MainInfoRequest = ({ request }) => {
         amount,
         branchId,
         creatorName,
-        HeadOfBranchName,
+        headOfBranchName,
         financeHandlerName,
         comment,
 
@@ -78,7 +78,7 @@ const MainInfoRequest = ({ request }) => {
                             </TableRow>
                             <TableRow>
                                 <TableCell align="left">Руководитель отдела:</TableCell>
-                                <TableCell align="right">{HeadOfBranchName || '—'}</TableCell>
+                                <TableCell align="right">{headOfBranchName || '—'}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell align="left">Финансист:</TableCell>

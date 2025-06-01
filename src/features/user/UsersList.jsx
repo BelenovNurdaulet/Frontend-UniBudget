@@ -122,8 +122,9 @@ const UsersList = () => {
                     ) : (
                         <TableContainer height="500px" style={{ marginTop: 16 }}>
                             <Table size="m" divider="row" stickyHeader fullWidth>
-                                <TableHead>
-                                    <TableRow>
+                                <TableHead style={{ zIndex: 2, position: 'sticky', top: 0 }}>
+
+                                <TableRow>
                                         <TableCell></TableCell>
                                         <SortableHeader field="userName" label="Имя пользователя" />
                                         <SortableHeader field="email" label="Email" />
@@ -144,8 +145,10 @@ const UsersList = () => {
                                         sortedUsers.map((user) => (
                                             <TableRow key={user.id}>
                                                 <TableCell>
-                                                    <Avatar size="xs" name={user.userName} />
+                                                       <Avatar size="xs" name={user.userName} />
+
                                                 </TableCell>
+
                                                 <TableCell  className={styles.singleLineCell}>{user.userName}</TableCell>
                                                 <TableCell className={styles.singleLineCell}>{user.email}</TableCell>
                                                 <TableCell className={styles.singleLineCell}>{ROLE_LABELS[user.role] || user.role}</TableCell>
